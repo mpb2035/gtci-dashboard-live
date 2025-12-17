@@ -1095,7 +1095,7 @@ let filters = { status: new Set(), search: '', year: '2025' };        let myChar
             updateSummary();
                 // Ensure 'All' filter button is marked as active
     document.querySelector('[onclick*="setFilter(\'status\', \'all\'"]').classList.add('active');
-                if (filters.year === '2023' && filters.status.size === 0) { document.getElementById('indicatorCount').textContent = '(69)'; }
+                if (filters.year === '2023') { document.getElementById('indicatorCount').textContent = '(69)'; }
         };
 
     </script>
