@@ -794,7 +794,7 @@
         <div id="pdfPage" class="page-content">
             <div style="display: flex; flex-direction: column; height: 100%; background: var(--bg-color);">
                 <div style="flex: 1; overflow: hidden; background: white; border-radius: 8px; margin: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <canvas id="pdfCanv as" style="width: 100%; height: 100%;"></canvas>
+                    <canvas id="pdfCanvas style="width: 100%; height: 100%;"></canvas>
                 </div>
                 <div style="text-align: center; padding: 1rem; color: #999; font-size: 0.9rem;">
                     <p>Brunei GTCI Ranking Report 2025</p>
@@ -1770,6 +1770,7 @@
         const pdfUrl = 'https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/91310606/a2eabc53-2edc-42fd-93af-3208a3e91208/2025-Brunei-GTCI-Ranking-1.pdf';
         pdfjsLib.getDocument(pdfUrl).promise.then(doc => {
             pdfDoc = doc;
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
             renderPage(pageNum);
         }).catch(error => {
             console.error('Error loading PDF:', error);
