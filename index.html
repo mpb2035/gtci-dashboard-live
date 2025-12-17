@@ -1734,8 +1734,9 @@
    const response = generateResponse(parseResult);
    responseBox.innerHTML = response;
    queryInput.value = '';
-     
- // ===== PAGE SWITCHING FUNCTIONALITY =====
+     }
+
+        ===== PAGE SWITCHING FUNCTIONALITY =====
     let currentPage = 'dashboard';
     let pdfDoc = null;
     let pageNum = 1;
@@ -1764,6 +1765,7 @@
             loadPDF();
         }
     }
+     
 
     function loadPDF() {
         if (pdfDoc) return;
