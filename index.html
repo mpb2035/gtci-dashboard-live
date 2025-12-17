@@ -1,17 +1,16 @@
+<!-- Force rebuild -->
+<!-- Published to GitHub Pages -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GTCI Comparison Dashboard | Brunei Darussalam</title>
-    
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    
     <!-- PDF.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    
     <style>
         :root {
             --primary-color: #0d47a1;
@@ -73,6 +72,7 @@
             display: flex;
             gap: 1rem;
             margin-left: auto;
+            margin-right: 1rem;
         }
         
         .tab-btn {
@@ -96,7 +96,7 @@
             border-color: white;
         }
         
-        /* Sidebar Toggle in Header */
+        /* Sidebar Toggle */
         .sidebar-toggle-btn {
             background: rgba(255, 255, 255, 0.15);
             color: white;
@@ -286,26 +286,30 @@
             color: #888;
         }
         
-        /* Main Dashboard Area */
-        .dashboard-panel {
+        /* Tab Views Container */
+        .views-container {
             flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            background-color: var(--bg-color);
+            display: flex;
+            overflow: hidden;
         }
         
-        /* Tab Views */
         #dashboard-view {
-            display: block;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            background-color: var(--bg-color);
         }
         
         #pdf-view {
             display: none;
             flex-direction: column;
-            height: 100%;
+            flex: 1;
+            overflow: hidden;
+            background-color: #f5f5f5;
         }
         
-        /* PDF Viewer */
+        /* PDF Viewer Controls */
         .pdf-controls {
             background: white;
             padding: 1rem;
@@ -314,16 +318,18 @@
             gap: 1rem;
             align-items: center;
             flex-wrap: wrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         
         .pdf-controls button {
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.2rem;
             background: var(--secondary-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9rem;
+            font-weight: 600;
             transition: background 0.2s;
         }
         
@@ -331,10 +337,16 @@
             background: var(--primary-color);
         }
         
+        .pdf-controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
         .pdf-page-info {
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
+            margin-left: 1rem;
         }
         
         .pdf-canvas-container {
@@ -351,6 +363,14 @@
             max-width: 100%;
             height: auto;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Main Dashboard Area */
+        .dashboard-panel {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: var(--bg-color);
         }
         
         /* Ranking Board */
@@ -448,51 +468,3 @@
         /* Chart */
         .chart-container {
             background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
-            height: 400px;
-        }
-        
-        /* Table */
-        .table-container {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .table-header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            gap: 1rem;
-        }
-        
-        .table-filters {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .filter-group {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        
-        .filter-label {
-            font-size: 0.85rem;
-            color: #666;
-            font-weight: 600;
-        }
-        
-        .filter-btn {
-            padding: 0.4rem 0.8rem;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 4px;
-            cursor: pointer;
