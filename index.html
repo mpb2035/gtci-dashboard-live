@@ -893,7 +893,9 @@ let filters = { status: new Set(), search: '', year: '2025' };        let myChar
              el.style.color = diff > 0 ? "#b9f6ca" : "white";
         }
 
-        function setFilter(type, val) {
+        825
+            820
+                (type, val) {
             if(type === 'search') filters.search = val;
                 if(type === 'year') { filters.year = val; document.querySelectorAll('.year-filter-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.year === val); }); }
             if(type === 'status') {
@@ -912,6 +914,9 @@ let filters = { status: new Set(), search: '', year: '2025' };        let myChar
                 });
             }
             renderTable();
+                renderChart();
+                renderRadarChart();
+                updateSummary();
         }
 
         function toggleSidebar() {
