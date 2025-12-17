@@ -1766,11 +1766,9 @@
 
 // Tab Switching Function
 function switchTab(tabName) {
-  // Get all main containers to toggle
-  const container = document.querySelector('.container');
-  const sidebar = document.querySelector('.sidebar');
-  const pdfPage = document.getElementById('pdfPage');
   const tabs = document.querySelectorAll('.nav-tab');
+  const pdfPage = document.getElementById('pdfPage');
+  const body = document.body;
   
   // Remove active class from all tabs
   tabs.forEach(tab => tab.classList.remove('active'));
@@ -1778,18 +1776,27 @@ function switchTab(tabName) {
   // Add active class to clicked tab
   event.target.classList.add('active');
   
-  // Toggle visibility based on selected tab
+  // Toggle visibility
   if (tabName === 'dashboard') {
-    // Show dashboard
-    if (container) container.style.display = 'block';
-    if (sidebar) sidebar.style.display = 'block';
+    body.style.overflow = 'auto';
+    // Show all body children except pdfPage
+    const allElements = body.querySelectorAll('header, .sidebar, .container');
+    allElements.forEach(el => el.style.display = '');
     if (pdfPage) pdfPage.style.display = 'none';
   } else if (tabName === 'gtci-report') {
-    // Show PDF page
-    if (container) container.style.display = 'none';
-    if (sidebar) sidebar.style.display = 'none';
-    if (pdfPage) pdfPage.style.display = 'block';
+    body.style.overflow = 'hidden';
+    // Hide dashboard elements
+    const dashboardElements = body.querySelectorAll('header ~ :not(#pdfPage)');
+    dashboardElements.forEach(el => {
+      if (el.id !== 'pdfPage') el.style.display = 'none';
+    });
+    // Show PDF page  
+    if (pdfPage) {
+      pdfPage.style.display = 'block';
+      pdfPage.style.overflow = 'auto';
+    }
   }
+}  }
 }		
 // PDF Viewer Variables and Functions
 let pdfDoc = null;
