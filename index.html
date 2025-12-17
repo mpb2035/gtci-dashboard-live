@@ -479,6 +479,7 @@
         .remark-cell a {
             color: var(--secondary-color);
             text-decoration: none;
+            
         }
 
         .remark-cell a:hover {
@@ -586,6 +587,50 @@
                 display: none;
             }
         }
+        
+	/* Navigation Tabs Styling */
+	.nav-tabs-container {
+		display: flex;
+		background-color: var(--primary-color);
+		border-bottom: 3px solid var(--secondary-color);
+		padding: 0;
+		margin: 0;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.nav-tab {
+		flex: 1;
+		padding: 12px 20px;
+		background-color: transparent;
+		color: rgba(255, 255, 255, 0.7);
+		border: none;
+		cursor: pointer;
+		font-size: 14px;
+		font-weight: 500;
+		transition: all 0.3s ease;
+		border-bottom: 3px solid transparent;
+		margin-bottom: -3px;
+	}
+
+	.nav-tab:hover {
+		color: white;
+		background-color: rgba(255, 255, 255, 0.1);
+	}
+
+	.nav-tab.active {
+		color: white;
+		border-bottom-color: var(--accent-color);
+		background-color: rgba(255, 255, 255, 0.05);
+	}
+
+	/* Page content styling */
+	.page-content {
+		display: none;
+	}
+
+	.page-content.active {
+		display: block;
+	}
     </style>
 </head>
 
@@ -606,6 +651,11 @@
         </div>
     </header>
 
+    <!-- Navigation Tabs -->
+<div class="nav-tabs-container">
+  <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+  <button class="nav-tab" onclick="switchTab('gtci-report')">📄 GTCI Report (PDF)</button>
+</div>
     <div class="container">
 
         <!-- INPUT SIDEBAR -->
@@ -1707,8 +1757,48 @@
    queryInput.value = '';
  }
 
+    
+
+// Tab Switching Function
+function switchTab(tabName) {
+  // Hide all page contents
+  const pages = document.querySelectorAll('.page-content');
+  pages.forEach(page => page.classList.remove('active'));
+  
+  // Remove active class from all tabs
+  const tabs = document.querySelectorAll('.nav-tab');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  
+  // Show selected page
+  if (tabName === 'dashboard') {
+    document.getElementById('dashboardPage').classList.add('active');
+  } else if (tabName === 'gtci-report') {
+    document.getElementById('pdfPage').classList.add('active');
+  }
+  
+  // Add active class to clicked tab
+  event.target.classList.add('active');
+}
     </script>
 
+<!-- PDF Page Container -->
+<div id="pdfPage" class="page-content" style="padding: 20px; background-color: #f4f6f8; min-height: 80vh; display: none;">
+  <div style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h2 style="color: #0d47a1; margin-bottom: 20px;">GTCI Report PDF</h2>
+    <p style="color: #333; margin-bottom: 20px; font-size: 16px;">The PDF file is being loaded. Please wait or download using the link below:</p>
+    
+    <div style="margin: 30px 0; padding: 30px; background-color: #f0f4f8; border-left: 4px solid #0d47a1; border-radius: 4px;">
+      <p style="color: #555; font-size: 14px;">📄 <strong>2025-Brunei-GTCI-Ranking Report</strong></p>
+      <p style="color: #666; margin-top: 10px; font-size: 14px;">To view or download the PDF report, please use one of the following options:</p>
+      <ul style="margin-top: 15px; padding-left: 20px;">
+        <li><a href="#" style="color: #0d47a1; text-decoration: none; font-weight: 500;">Open PDF Viewer</a></li>
+        <li style="margin-top: 10px;"><a href="#" style="color: #0d47a1; text-decoration: none; font-weight: 500;">Download PDF</a></li>
+      </ul>
+    </div>
+    
+    <p style="color: #999; font-size: 12px; margin-top: 20px; text-align: center;">Note: PDF functionality requires the PDF file to be uploaded to the repository.</p>
+  </div>
+</div>
 </body>
 
 </html>
