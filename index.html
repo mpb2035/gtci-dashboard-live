@@ -412,7 +412,6 @@
 <body>
 
     <header>
-        <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">☰</button>
         <div class="header-content">
             <div style="display: flex; flex-direction: column; margin-left: 1rem;">
                 <span style="font-variant: small-caps; font-size: 0.8rem; font-weight: 500; opacity: 0.9; line-height: 1;">by sfzn</span>
@@ -429,33 +428,6 @@
 
     <div id="dashboard-view">
         
-        <aside class="input-panel" id="sidebar">
-            <div class="input-header">
-                <div class="input-header-top">
-                    <h2>Data Input</h2>
-                    <button class="btn btn-sm btn-outline" id="lockBtn" onclick="toggleLock()">
-                        <span id="lockIcon">🔓</span> <span id="lockText">Unlock</span>
-                    </button>
-                </div>
-
-                <div class="global-rank-inputs">
-                    <div class="rank-field">
-                        <label>Rank '23</label>
-                        <input type="number" id="rank2023Input" value="41" onchange="updateRank()">
-                    </div>
-                    <div class="rank-field">
-                        <label>Rank '25</label>
-                        <input type="number" id="rank2025Input" value="43" onchange="updateRank()">
-                    </div>
-                </div>
-
-                <div class="input-controls">
-                    <button class="btn btn-outline" style="width:100%" onclick="resetData()">Clear All Data</button>
-                </div>
-            </div>
-            <div class="input-scroll-area" id="inputContainer">
-                </div>
-        </aside>
 
         <main class="dashboard-panel">
             
