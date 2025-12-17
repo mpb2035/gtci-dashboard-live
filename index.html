@@ -744,6 +744,9 @@ let filters = { status: new Set(), search: '', year: '2025' };        let myChar
             if(filters.year === '2023') {
                 if(ind.indicatorStatus === 'new' || ind.indicatorStatus === 'replaced') return false;
             }
+                            if(filters.year === '2025') {
+                if(ind.indicatorStatus === 'replaced') return false;
+            }
                 if (filters.search) {
                     const q = filters.search.toLowerCase();
                     if (!ind.code.toLowerCase().includes(q) && !ind.name.toLowerCase().includes(q)) return false;
