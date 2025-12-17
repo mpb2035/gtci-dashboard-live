@@ -1774,7 +1774,9 @@ function switchTab(tabName) {
   tabs.forEach(tab => tab.classList.remove('active'));
   
   // Add active class to clicked tab
-  event.target.classList.add('active');
+  // Find and set active tab based on tabName
+    const activeTab = Array.from(tabs).find(tab => tab.textContent.toLowerCase().includes(tabName.toLowerCase()) || tab.getAttribute('data-tab') === tabName);
+    if (activeTab) activeTab.classList.add('active');
   
   // Toggle visibility
   if (tabName === 'dashboard') {
@@ -1798,7 +1800,7 @@ function switchTab(tabName) {
   }
 }  }
 }		
-// PDF Viewer Variables and Functions
+1768 and Functions
 let pdfDoc = null;
 let pageNum = 1;
 let pageCount = 0;
