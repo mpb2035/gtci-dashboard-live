@@ -14,6 +14,11 @@
         :root {
             --primary-color: #0d47a1;
             --secondary-color: #1976d2;
+			 <!-- PDF.js -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+ <script>
+   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ </script>
             --accent-color: #42a5f5;
             --bg-color: #f4f6f8;
             --card-bg: #ffffff;
@@ -1779,26 +1784,73 @@ function switchTab(tabName) {
   // Add active class to clicked tab
   event.target.classList.add('active');
 }
+		
+// PDF Viewer Variables and Functions
+let pdfDoc = null;
+let pageNum = 1;
+let pageCount = 0;
+
+// Load PDF when page loads
+window.addEventListener('load', function() {
+  const pdfUrl = '2025%20Brunei%20GTCI%20Ranking%20(1).pdf';
+  pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+    pdfDoc = pdf;
+    pageCount = pdf.numPages;
+    renderPage(1);
+  }).catch(function(error) {
+    console.log('Error loading PDF:', error);
+    document.getElementById('pdfCanvas').innerHTML = '<p style="color: red; padding: 20px;">Error loading PDF. Please check if the file is uploaded correctly.</p>';
+  });
+});
+
+function renderPage(num) {
+  if (!pdfDoc || num < 1 || num > pageCount) return;
+  pageNum = num;
+  pdfDoc.getPage(num).then(function(page) {
+    const scale = 1.5;
+    const viewport = page.getViewport({ scale: scale });
+    const canvas = document.getElementById('pdfCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const renderContext = {
+      canvasContext: ctx,
+      viewport: viewport
+    };
+    page.render(renderContext);
+    document.getElementById('pageInfo').textContent = 'Page ' + num + ' of ' + pageCount;
+  });
+}
+
+function nextPage() {
+  if (pageNum < pageCount) {
+    renderPage(pageNum + 1);
+  }
+}
+
+function previousPage() {
+  if (pageNum > 1) {
+    renderPage(pageNum - 1);
+  }
+}
     </script>
 
 <!-- PDF Page Container -->
-<div id="pdfPage" class="page-content" style="padding: 20px; background-color: #f4f6f8; min-height: 80vh; display: none;">
-  <div style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    <h2 style="color: #0d47a1; margin-bottom: 20px;">GTCI Report PDF</h2>
-    <p style="color: #333; margin-bottom: 20px; font-size: 16px;">The PDF file is being loaded. Please wait or download using the link below:</p>
-    
-    <div style="margin: 30px 0; padding: 30px; background-color: #f0f4f8; border-left: 4px solid #0d47a1; border-radius: 4px;">
-      <p style="color: #555; font-size: 14px;">📄 <strong>2025-Brunei-GTCI-Ranking Report</strong></p>
-      <p style="color: #666; margin-top: 10px; font-size: 14px;">To view or download the PDF report, please use one of the following options:</p>
-      <ul style="margin-top: 15px; padding-left: 20px;">
-        <li><a href="#" style="color: #0d47a1; text-decoration: none; font-weight: 500;">Open PDF Viewer</a></li>
-        <li style="margin-top: 10px;"><a href="#" style="color: #0d47a1; text-decoration: none; font-weight: 500;">Download PDF</a></li>
-      </ul>
+<div id="pdfPage" class="page-content" style="padding: 20px; background-color: #f4f6f8; min-height: calc(100vh - 200px); display: none;">
+  <div style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: 100%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+      <h2 style="color: #0d47a1; margin: 0;">📄 GTCI Report PDF Viewer</h2>
+      <div style="display: flex; gap: 10px;">
+        <button onclick="previousPage()" style="padding: 8px 16px; background-color: #0d47a1; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">← Previous</button>
+        <span id="pageInfo" style="padding: 8px 16px; background-color: #f0f4f8; border-radius: 4px; min-width: 100px; text-align: center;">Page 1</span>
+        <button onclick="nextPage()" style="padding: 8px 16px; background-color: #0d47a1; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Next →</button>
+        <a href="2025%20Brunei%20GTCI%20Ranking%20(1).pdf" download style="padding: 8px 16px; background-color: #2e7d32; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; text-decoration: none;">⬇ Download</a>
+      </div>
     </div>
-    
-    <p style="color: #999; font-size: 12px; margin-top: 20px; text-align: center;">Note: PDF functionality requires the PDF file to be uploaded to the repository.</p>
+    <div id="pdfContainer" style="height: calc(100vh - 300px); border: 1px solid #e0e0e0; border-radius: 4px; overflow: auto; background: #ddd; padding: 10px;">
+      <canvas id="pdfCanvas" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />
+    </div>
   </div>
-</div>
-</body>
+</div></body>
 
 </html>
