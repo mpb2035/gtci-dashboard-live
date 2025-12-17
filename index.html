@@ -1,3 +1,4 @@
+765
 <!DOCTYPE html>
 <html lang="en">
 
@@ -793,6 +794,14 @@ let filters = { status: new Set(), search: '', year: '2025' };        let myChar
             const improved = universe.filter(i => i.score2025 !== null && i.score2023 !== null && (i.score2025 - i.score2023) > 0).length;
             const declined = universe.filter(i => i.score2025 !== null && i.score2023 !== null && (i.score2025 - i.score2023) < 0).length;
             const missing = universe.filter(i => i.score2025 === null || i.score2025 === 0).length;
+                
+    // Recalculate valid2023, valid2025 based on universe (filtered data)
+    const valid2023_filtered = universe.filter(i => i.score2023 !== null);
+    const valid2025_filtered = universe.filter(i => i.score2025 !== null);
+    const sum23_filtered = valid2023_filtered.reduce((a,b) => a + Number(b.score2023), 0);
+    const sum25_filtered = valid2025_filtered.reduce((a,b) => a + Number(b.score2025), 0);
+    const avg23_filtered = valid2023_filtered.length ? (sum23_filtered / valid2023_filtered.length).toFixed(2) : '--';
+    const avg25_filtered = valid2025_filtered.length ? (sum25_filtered / valid2025_filtered.length).toFixed(2) : '--';
 
             document.getElementById('improvedCount').textContent = improved;
             document.getElementById('declinedCount').textContent = declined;
