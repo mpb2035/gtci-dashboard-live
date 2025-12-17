@@ -1766,25 +1766,31 @@
 
 // Tab Switching Function
 function switchTab(tabName) {
-  // Hide all page contents
-  const pages = document.querySelectorAll('.page-content');
-  pages.forEach(page => page.classList.remove('active'));
+  // Get all main containers to toggle
+  const container = document.querySelector('.container');
+  const sidebar = document.querySelector('.sidebar');
+  const pdfPage = document.getElementById('pdfPage');
+  const tabs = document.querySelectorAll('.nav-tab');
   
   // Remove active class from all tabs
-  const tabs = document.querySelectorAll('.nav-tab');
   tabs.forEach(tab => tab.classList.remove('active'));
-  
-  // Show selected page
-  if (tabName === 'dashboard') {
-    document.getElementById('dashboardPage').classList.add('active');
-  } else if (tabName === 'gtci-report') {
-    document.getElementById('pdfPage').classList.add('active');
-  }
   
   // Add active class to clicked tab
   event.target.classList.add('active');
-}
-		
+  
+  // Toggle visibility based on selected tab
+  if (tabName === 'dashboard') {
+    // Show dashboard
+    if (container) container.style.display = 'block';
+    if (sidebar) sidebar.style.display = 'block';
+    if (pdfPage) pdfPage.style.display = 'none';
+  } else if (tabName === 'gtci-report') {
+    // Show PDF page
+    if (container) container.style.display = 'none';
+    if (sidebar) sidebar.style.display = 'none';
+    if (pdfPage) pdfPage.style.display = 'block';
+  }
+}		
 // PDF Viewer Variables and Functions
 let pdfDoc = null;
 let pageNum = 1;
