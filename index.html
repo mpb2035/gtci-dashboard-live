@@ -526,6 +526,10 @@
                 <div class="table-header">
                     <h3>Detailed Breakdown <span id="indicatorCount" style="font-size: 0.8em; color: #666;"></span></h3>
                     <div class="table-filters">
+                                    <div class="table-filters">
+                <button class="filter-btn year-filter-btn active" data-year="2025" onclick="setFilter('year', '2025')">2025 (77)</button>
+                <button class="filter-btn year-filter-btn" data-year="2023" onclick="setFilter('year', '2023')">2023 (69)</button>
+            </div>
                         <input type="text" placeholder="Search code/name..." style="padding: 0.4rem;" oninput="setFilter('search', this.value)">
                         <button class="filter-btn active" onclick="setFilter('status', 'all', this)">All</button>
                         <button class="filter-btn" onclick="setFilter('status', 'improved', this)">Improved</button>
@@ -678,8 +682,7 @@
 
         let indicators = [];
         let currentSort = { key: 'code', dir: 'asc' };
-        let filters = { status: new Set(), search: '' };
-        let myChart = null;
+let filters = { status: new Set(), search: '', year: '2025' };        let myChart = null;
         let myRadarChart = null;
         let isLocked = false;
         let sidebarCollapsed = false;
@@ -737,6 +740,10 @@
             
             let filtered = indicators.filter(ind => {
                 // Filter logic
+                            // Year-based filtering
+            if(filters.year === '2023') {
+                if(ind.indicatorStatus === 'new' || ind.indicatorStatus === 'replaced') return false;
+            }
                 if (filters.search) {
                     const q = filters.search.toLowerCase();
                     if (!ind.code.toLowerCase().includes(q) && !ind.name.toLowerCase().includes(q)) return false;
@@ -910,6 +917,7 @@
 
         function setFilter(type, val) {
             if(type === 'search') filters.search = val;
+                if(type === 'year') { filters.year = val; document.querySelectorAll('.year-filter-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.year === val); }); }
             if(type === 'status') {
                 if(val === 'all') filters.status.clear();
                 else {
