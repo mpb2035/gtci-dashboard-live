@@ -1268,8 +1268,8 @@
             const count2025 = valid2025.length;
             const count2023 = valid2023.length;
 
-            const avg23 = "51.74";
-            const avg25 = "51.48";
+            const avg23 = count2023 > 0 ? (sum2023 / count2023).toFixed(2) : '--';
+            const avg25 = count2025 > 0 ? (sum2025 / count2025).toFixed(2) : '--';
 
             const change = (avg25 !== '--' && avg23 !== '--') ? (avg25 - avg23).toFixed(2) : 0;
 
@@ -1859,7 +1859,7 @@ function previousPage() {
         <button onclick="previousPage()" style="padding: 8px 16px; background-color: #0d47a1; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">← Previous</button>
         <span id="pageInfo" style="padding: 8px 16px; background-color: #f0f4f8; border-radius: 4px; min-width: 100px; text-align: center;">Page 1</span>
         <button onclick="nextPage()" style="padding: 8px 16px; background-color: #0d47a1; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Next →</button>
-        <a href="2025 Brunei GTCI Ranking (1).pdf" download style="padding: 8px 16px; background-color: #2e7d32; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; text-decoration: none;">⬇ Download</a>
+        <a href="2025%20Brunei%20GTCI%20Ranking (1).pdf" download style="padding: 8px 16px; background-color: #2e7d32; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; text-decoration: none;">⬇ Download</a>
       </div>
     </div>
     <div id="pdfContainer" style="height: calc(100vh - 300px); border: 1px solid #e0e0e0; border-radius: 4px; overflow: auto; background: #ddd; padding: 10px;">
