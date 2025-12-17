@@ -1093,6 +1093,8 @@ let filters = { status: new Set(), search: '', year: '2025' };        let myChar
             renderChart();
             renderRadarChart();
             updateSummary();
+                // Ensure 'All' filter button is marked as active
+    document.querySelector('[onclick*="setFilter(\'status\', \'all\'"]').classList.add('active');
         };
 
     </script>
