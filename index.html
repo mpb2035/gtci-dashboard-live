@@ -1735,38 +1735,6 @@
    responseBox.innerHTML = response;
    queryInput.value = '';
      }
-
-        ===== PAGE SWITCHING FUNCTIONALITY =====
-    let currentPage = 'dashboard';
-    let pdfDoc = null;
-    let pageNum = 1;
-
-    function switchPage(page) {
-        currentPage = page;
-        const dashboardPage = document.getElementById('dashboardPage');
-        const pdfPage = document.getElementById('pdfPage');
-        const tab1 = document.getElementById('pageTab1');
-        const tab2 = document.getElementById('pageTab2');
-
-        if (page === 'dashboard') {
-            dashboardPage.classList.add('active');
-            pdfPage.classList.remove('active');
-            tab1.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
-            tab1.style.borderColor = 'white';
-            tab2.style.backgroundColor = 'transparent';
-            tab2.style.borderColor = 'transparent';
-        } else if (page === 'pdf') {
-            dashboardPage.classList.remove('active');
-            pdfPage.classList.add('active');
-            tab1.style.backgroundColor = 'transparent';
-            tab1.style.borderColor = 'transparent';
-            tab2.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
-            tab2.style.borderColor = 'white';
-            loadPDF();
-        }
-    }
-     
-
     function loadPDF() {
         if (pdfDoc) return;
         const pdfUrl = 'https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/91310606/a2eabc53-2edc-42fd-93af-3208a3e91208/2025-Brunei-GTCI-Ranking-1.pdf';
