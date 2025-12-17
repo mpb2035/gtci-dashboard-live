@@ -808,22 +808,10 @@ let filters = { status: new Set(), search: '', year: '2025' };        let myChar
             document.getElementById('missingCount').textContent = missing;
             
             // Hardcoded display for top cards as per requirement to match report unless computed
-            const sum23 = valid2023.reduce((a,b) => a + Number(b.score2023), 0);
-    const avg23 = valid2023.length ? (sum23 / valid2023.length).toFixed(2) : '--';
-    const scoreDiff = avg25 !== '--' && avg23 !== '--' ? (Number(avg25) - Number(avg23)).toFixed(2) : '--';
-    let scoreDiffStr = '--', netChangeStr = '--';
-    
-    if (scoreDiff !== '--') {
-        scoreDiffStr = scoreDiff > 0 ? '▲ ' + scoreDiff : '▼ ' + Math.abs(scoreDiff);
-        netChangeStr = scoreDiff > 0 ? '+' + scoreDiff : scoreDiff;
-    }
-    
-    document.getElementById('displayScore2023').textContent = avg23;
-    document.getElementById('displayScore2025').textContent = avg25;
-    document.getElementById('scoreDiff').textContent = scoreDiffStr;
-    document.getElementById('netChange').textContent = netChangeStr;
-    document.getElementById('netTrend').innerHTML = scoreDiff !== '--' ? (scoreDiff > 0 ? '<span class="trend-up">▲ Improved</span>' : '<span class="trend-down">▼ Declined</span>') : '<span class="trend-neutral">--</span>';
-        }
+ const sum23 = valid2023_filtered.reduce((a,b) => a + Number(b.score2023), 0);    const avg23 = valid2023.length ? (sum23 / valid2023.length).toFixed(2) : '-
+             const avg23 = valid2023_filtered.length ? (sum23 / valid2023_filtered.length).toFixed(2) : '--';
+        const scoreDiff = avg25 !== '--' && avg23 !== '--' ? (Number(avg25) - Number(avg23)).toFixed(2) : '--';
+        let scoreDiffStr = '--', netChangeStr = '--';
 
         function renderChart() {
             const ctx = document.getElementById('comparisonChart').getContext('2d');
