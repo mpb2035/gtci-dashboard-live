@@ -1805,7 +1805,7 @@ let pageCount = 0;
 
 // Load PDF when page loads
 window.addEventListener('load', function() {
-  const pdfUrl = '2025 Brunei GTCI Ranking (1).pdf';
+  const pdfUrl = '2025%20Brunei%20GTCI%20Ranking%20(1).pdf';
   pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
     pdfDoc = pdf;
     pageCount = pdf.numPages;
