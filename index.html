@@ -1,15 +1,17 @@
-<!-- Force rebuild -->
-<!-- Published to GitHub Pages -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GTCI Comparison Dashboard | Brunei Darussalam</title>
+    
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
     <style>
         :root {
             --primary-color: #0d47a1;
@@ -24,14 +26,14 @@
             --neutral: #757575;
             --sidebar-width: 400px;
         }
-
+        
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-
+        
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -39,8 +41,7 @@
             display: flex;
             flex-direction: column;
         }
-
-
+        
         /* Header */
         header {
             background-color: var(--primary-color);
@@ -53,20 +54,48 @@
             top: 0;
             z-index: 100;
         }
-
+        
         .header-content {
             flex: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
+        
         header h1 {
             font-size: 1.5rem;
             font-weight: 600;
             margin-left: 1rem;
         }
-
+        
+        /* Tab Buttons */
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-left: auto;
+        }
+        
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+        }
+        
         /* Sidebar Toggle in Header */
         .sidebar-toggle-btn {
             background: rgba(255, 255, 255, 0.15);
@@ -81,20 +110,19 @@
             justify-content: center;
             transition: background 0.2s;
         }
-
+        
         .sidebar-toggle-btn:hover {
             background: rgba(255, 255, 255, 0.3);
         }
-
+        
         /* Main Layout */
         .container {
             display: flex;
             flex: 1;
             overflow: hidden;
             position: relative;
-            /* Container fits remaining height under sticky header if needed, but flex column body handles it */
         }
-
+        
         /* Sidebar - Input Section */
         .input-panel {
             width: var(--sidebar-width);
@@ -106,26 +134,25 @@
             transition: margin-left 0.3s ease;
             z-index: 10;
             height: calc(100vh - 60px);
-            /* Adjust for header approx height */
         }
-
+        
         .input-panel.collapsed {
             margin-left: calc(-1 * var(--sidebar-width));
         }
-
+        
         .input-header {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
             background: #fafafa;
         }
-
+        
         .input-header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.5rem;
         }
-
+        
         .global-rank-inputs {
             display: flex;
             gap: 1rem;
@@ -134,27 +161,27 @@
             background: #e3f2fd;
             border-radius: 4px;
         }
-
+        
         .rank-field label {
             display: block;
             font-size: 0.7rem;
             font-weight: 700;
             color: var(--primary-color);
         }
-
+        
         .rank-field input {
             width: 60px;
             padding: 0.3rem;
             border: 1px solid #90caf9;
             border-radius: 4px;
         }
-
+        
         .input-controls {
             display: flex;
             gap: 0.5rem;
             margin-top: 0.5rem;
         }
-
+        
         .btn {
             padding: 0.5rem 1rem;
             border: none;
@@ -166,38 +193,37 @@
             align-items: center;
             gap: 0.3rem;
         }
-
+        
         .btn-primary {
             background-color: var(--secondary-color);
             color: white;
         }
-
+        
         .btn-primary:hover {
             background-color: var(--primary-color);
         }
-
+        
         .btn-outline {
             background-color: transparent;
             border: 1px solid var(--secondary-color);
             color: var(--secondary-color);
         }
-
+        
         .btn-outline:hover {
             background-color: #e3f2fd;
         }
-
+        
         .btn-sm {
             padding: 0.3rem 0.6rem;
             font-size: 0.8rem;
         }
-
-
+        
         .input-scroll-area {
             flex: 1;
             overflow-y: auto;
             padding: 1rem;
         }
-
+        
         .pillar-title {
             font-size: 0.85rem;
             font-weight: 700;
@@ -208,7 +234,7 @@
             padding: 0.4rem;
             border-radius: 4px;
         }
-
+        
         .indicator-item {
             margin-bottom: 0.8rem;
             padding: 0.8rem;
@@ -216,12 +242,12 @@
             border: 1px solid #eee;
             border-radius: 4px;
         }
-
+        
         .indicator-item:focus-within {
             background: #fafafa;
             border-color: var(--accent-color);
         }
-
+        
         .indicator-label {
             display: block;
             font-size: 0.8rem;
@@ -229,24 +255,24 @@
             margin-bottom: 0.5rem;
             color: #333;
         }
-
+        
         .indicator-inputs {
             display: flex;
             gap: 0.5rem;
             align-items: flex-end;
         }
-
+        
         .input-field {
             flex: 1;
         }
-
+        
         .input-field label {
             display: block;
             font-size: 0.65rem;
             color: #666;
             margin-bottom: 2px;
         }
-
+        
         .input-field input {
             width: 100%;
             padding: 0.4rem;
@@ -254,30 +280,79 @@
             border-radius: 3px;
             font-size: 0.9rem;
         }
-
+        
         .input-field input:disabled {
             background: #f5f5f5;
             color: #888;
         }
-
-        .remark-field {
-            flex: 1.5;
-        }
-
-        .remark-field input {
-            width: 100%;
-            font-size: 0.8rem;
-        }
-
+        
         /* Main Dashboard Area */
         .dashboard-panel {
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
             background-color: var(--bg-color);
-            transition: margin-left 0.3s;
         }
-
+        
+        /* Tab Views */
+        #dashboard-view {
+            display: block;
+        }
+        
+        #pdf-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        /* PDF Viewer */
+        .pdf-controls {
+            background: white;
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .pdf-controls button {
+            padding: 0.5rem 1rem;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        
+        .pdf-controls button:hover {
+            background: var(--primary-color);
+        }
+        
+        .pdf-page-info {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .pdf-canvas-container {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 1rem;
+            background: #f5f5f5;
+        }
+        
+        #pdf-canvas {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
         /* Ranking Board */
         .ranking-board {
             display: flex;
@@ -290,29 +365,29 @@
             justify-content: space-around;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
+        
         .rank-card {
             text-align: center;
         }
-
+        
         .rank-card h3 {
             font-size: 1rem;
             opacity: 0.9;
             margin-bottom: 0.5rem;
         }
-
+        
         .rank-card .big-number {
             font-size: 2.5rem;
             font-weight: 800;
         }
-
+        
         .rank-card .diff {
             font-size: 0.9rem;
             background: rgba(255, 255, 255, 0.2);
             padding: 0.2rem 0.5rem;
             border-radius: 12px;
         }
-
+        
         /* Summary Cards */
         .summary-grid {
             display: grid;
@@ -320,7 +395,7 @@
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
-
+        
         .card {
             background: var(--card-bg);
             padding: 1.5rem;
@@ -330,24 +405,24 @@
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-
+        
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
+        
         .card-title {
             font-size: 0.9rem;
             color: #666;
             margin-bottom: 0.5rem;
         }
-
+        
         .card-value {
             font-size: 2rem;
             font-weight: 700;
             color: var(--primary-color);
         }
-
+        
         .trend-value {
             font-size: 1rem;
             font-weight: 600;
@@ -357,19 +432,19 @@
             justify-content: center;
             gap: 0.3rem;
         }
-
+        
         .trend-up {
             color: var(--success);
         }
-
+        
         .trend-down {
             color: var(--danger);
         }
-
+        
         .trend-neutral {
             color: var(--neutral);
         }
-
+        
         /* Chart */
         .chart-container {
             background: var(--card-bg);
@@ -379,7 +454,7 @@
             margin-bottom: 2rem;
             height: 400px;
         }
-
+        
         /* Table */
         .table-container {
             background: var(--card-bg);
@@ -387,7 +462,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-
+        
         .table-header {
             display: flex;
             flex-wrap: wrap;
@@ -396,1319 +471,28 @@
             margin-bottom: 1rem;
             gap: 1rem;
         }
-
+        
         .table-filters {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
-
+        
         .filter-group {
             display: flex;
             gap: 0.5rem;
             align-items: center;
         }
-
+        
         .filter-label {
             font-size: 0.85rem;
             color: #666;
             font-weight: 600;
         }
-
+        
         .filter-btn {
             padding: 0.4rem 0.8rem;
             border: 1px solid #ddd;
             background: white;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        .filter-btn.active {
-            background-color: var(--secondary-color);
-            color: white;
-            border-color: var(--secondary-color);
-        }
-
-        select.filter-select {
-            padding: 0.4rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 0.8rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            font-weight: 600;
-            color: #444;
-            cursor: pointer;
-            background: #fafafa;
-        }
-
-        th:hover {
-            background: #f0f0f0;
-        }
-
-        .score-cell {
-            font-family: monospace;
-            font-size: 1rem;
-        }
-
-        .trend-icon {
-            font-weight: bold;
-        }
-
-        .remark-cell {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .remark-cell a {
-            color: var(--secondary-color);
-            text-decoration: none;
-        }
-
-        .remark-cell a:hover {
-            text-decoration: underline;
-        }
-
-        .source-cell {
-            max-width: 250px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* Data Owner column styling */
-        td:nth-child(6) {
-            max-width: 220px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 0.9rem;
-        }
-
-        /* Ensure all table cells handle overflow */
-        td {
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-
-        .remark-input-table {
-            width: 100%;
-            border: 1px solid transparent;
-            background: transparent;
-            padding: 4px;
-        }
-
-        .remark-input-table:hover {
-            border-color: #ddd;
-            background: white;
-        }
-
-        /* Indicator Status Badges */
-        .indicator-badge {
-            display: inline-block;
-            font-size: 0.65rem;
-            font-weight: 600;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-left: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .badge-replaced {
-            background-color: #fee;
-            color: #d32f2f;
-            border: 1px solid #ffcdd2;
-        }
-
-        .badge-new {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #c8e6c9;
-        }
-
-        .badge-code-changed {
-            background-color: #e3f2fd;
-            color: #1976d2;
-            border: 1px solid #bbdefb;
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #999;
-        }
-
-        @media (max-width: 900px) {
-            .container {
-                flex-direction: column;
-                overflow: auto;
-            }
-
-            .input-panel {
-                width: 100%;
-                height: auto;
-                max-height: 400px;
-                border-right: none;
-                position: relative;
-                margin-left: 0 !important;
-            }
-
-            .sidebar-toggle-btn {
-                display: none;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <header>
-        <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
-            ☰
-        </button>
-        <div class="header-content">
-            <div style="display: flex; flex-direction: column; margin-left: 1rem;">
-                <span
-                    style="font-variant: small-caps; font-size: 0.8rem; font-weight: 500; opacity: 0.9; line-height: 1;">by
-                    sfzn</span>
-                <h1 style="margin-left: 0;">GTCI Dashboard | Brunei Darussalam</h1>
-            </div>
-            <div style="font-size: 0.9rem; opacity: 0.9;">2023 vs 2025 Comparison</div>
-        </div>
-    </header>
-
-    <div class="container">
-
-        <!-- INPUT SIDEBAR -->
-        <aside class="input-panel" id="sidebar">
-            <div class="input-header">
-                <div class="input-header-top">
-                    <h2>Data Input</h2>
-                    <button class="btn btn-sm btn-outline" id="lockBtn" onclick="toggleLock()">
-                        <span id="lockIcon">🔓</span> <span id="lockText">Unlock</span>
-                    </button>
-                </div>
-
-                <div class="global-rank-inputs">
-                    <div class="rank-field">
-                        <label>Rank '23</label>
-                        <input type="number" id="rank2023Input" value="41" onchange="updateRank()">
-                    </div>
-                    <div class="rank-field">
-                        <label>Rank '25</label>
-                        <input type="number" id="rank2025Input" value="43" onchange="updateRank()">
-                    </div>
-                </div>
-
-                <div class="input-controls">
-                    <button class="btn btn-outline" style="width:100%" onclick="resetData()">Clear All Data</button>
-                </div>
-            </div>
-            <div class="input-scroll-area" id="inputContainer">
-                <!-- Inputs generated by JS -->
-            </div>
-        </aside>
-
-        <!-- MAIN DASHBOARD -->
-        <main class="dashboard-panel">
-
-             <!-- INTELLIGENT QUERY SYSTEM -->
-             <div style="background: linear-gradient(135deg, #e3f2fd, #f3e5f5); border-bottom: 2px solid #1976d2; padding: 1.5rem 2rem; margin-bottom: 2rem; border-radius: 8px;">
-                  <h2 style="color: #0d47a1; margin-bottom: 0.5rem; font-size: 1.3rem;">📊 Intelligent Data Query System</h2>
-                  <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Ask natural language questions about GTCI indicators, data owners, ministries, and data sources</p>
-                  <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                       <input type="text" id="queryInput" placeholder="e.g., 'How many indicators improved?' 'Which ministry manages education?'" style="flex: 1; padding: 0.8rem; border: 2px solid #90caf9; border-radius: 6px; font-size: 1rem;">
-                       <button onclick="executeQuery()" style="padding: 0.8rem 1.5rem; background: #1976d2; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 1rem;">🔍 Query</button>
-                       <button onclick="clearQueryResponse()" style="padding: 0.8rem 1.5rem; background: #757575; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Clear</button>
-                       </div>
-                  <div id="queryResponse" style="background: white; border-left: 4px solid #1976d2; padding: 1.5rem; border-radius: 6px; display: none; max-height: 500px; overflow-y: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                       <h3 id="queryTitle" style="color: #0d47a1; margin-bottom: 1rem; font-size: 1.1rem;"></h3>
-                       <div id="responseContent" style="color: #333; line-height: 1.7; font-size: 0.95rem;"></div>
-                       </div>
-                  <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ccc;">
-                       <p style="color: #666; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">📌 Try these example queries:</p>
-                       <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                            <button onclick="suggestedQuery('improved')" style="padding: 0.4rem 0.8rem; background: #e3f2fd; color: #1976d2; border: 1px solid #90caf9; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Improved Indicators</button>
-                            <button onclick="suggestedQuery('data_owners')" style="padding: 0.4rem 0.8rem; background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Data Owners</button>
-                            <button onclick="suggestedQuery('sources')" style="padding: 0.4rem 0.8rem; background: #e8f5e9; color: #2e7d32; border: 1px solid #81c784; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Data Sources</button>
-                            <button onclick="suggestedQuery('ministries')" style="padding: 0.4rem 0.8rem; background: #fff3e0; color: #e65100; border: 1px solid #ffb74d; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">All Ministries</button>
-                            <button onclick="suggestedQuery('missing')" style="padding: 0.4rem 0.8rem; background: #fce4ec; color: #c2185b; border: 1px solid #f48fb1; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Missing Data</button>
-                            </div>
-                       </div>
-                  </div>
-            
-            <!-- RANKING BOARD -->
-            <div class="ranking-board">
-                <div class="rank-card">
-                    <h3>Global Rank 2023</h3>
-                    <div class="big-number" id="displayRank2023">41</div>
-                </div>
-                <div class="rank-card">
-                    <h3>Global Rank 2025</h3>
-                    <div class="big-number" id="displayRank2025">43</div>
-                    <div class="diff" id="rankDiff">▼ 2</div>
-                </div>
-                <div class="rank-card">
-                    <h3>Score 2023</h3>
-                    <div class="big-number" id="displayScore2023">--</div>
-                </div>
-                <div class="rank-card">
-                    <h3>Score 2025</h3>
-                    <div class="big-number" id="displayScore2025">--</div>
-                    <div class="diff" id="scoreDiff">--</div>
-                </div>
-            </div>
-
-            <!-- SUMMARY CARDS -->
-            <div class="summary-grid">
-                <div class="card" onclick="setFilter('status', 'all', null)">
-                    <div class="card-title">Net Score Change</div>
-                    <div class="card-value" id="netChange">--</div>
-                    <div class="trend-value" id="netTrend"></div>
-                </div>
-                <div class="card" onclick="setFilter('status', 'improved', null)">
-                    <div class="card-title">Number of Improved Indicators</div>
-                    <div class="card-value" id="improvedCount" style="color: var(--success)">--</div>
-                </div>
-                <div class="card" onclick="setFilter('status', 'declined', null)">
-                    <div class="card-title">Number of Declined Indicators</div>
-                    <div class="card-value" id="declinedCount" style="color: var(--danger)">--</div>
-                </div>
-                <div class="card" onclick="setFilter('status', 'missing', null)">
-                    <div class="card-title">Missing/Zero Data (2025)</div>
-                    <div class="card-value" id="missingCount" style="color: #ff9800">--</div>
-                </div>
-            </div>
-
-            <!-- CHART -->
-            <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
-                <div class="chart-container" style="flex: 1;">
-                    <canvas id="comparisonChart"></canvas>
-                </div>
-                <div class="chart-container" style="flex: 1;">
-                    <canvas id="radarChart"></canvas>
-                </div>
-            </div>
-
-            <!-- TABLE -->
-            <div class="table-container">
-                <div class="table-header">
-                    <h3>Detailed Indicator Breakdown <span id="indicatorCount"
-                            style="font-size: 0.8em; color: #666; font-weight: normal;"></span></h3>
-
-                    <div class="table-filters">
-                        <div class="filter-group">
-                            <span class="filter-label">Filter:</span>
-                            <!-- Search -->
-                            <input type="text" placeholder="Search code or name..."
-                                style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; margin-right: 1rem; font-size: 0.9rem;"
-                                oninput="setFilter('search', this.value)">
-
-                            <button class="filter-btn active" onclick="setFilter('status', 'all', this)">All</button>
-                            <button class="filter-btn" onclick="setFilter('status', '2023', this)">2023</button>
-                            <button class="filter-btn" onclick="setFilter('status', '2025', this)">2025</button>
-                            <button class="filter-btn" onclick="setFilter('status', 'improved', this)">Improved</button>
-                            <button class="filter-btn" onclick="setFilter('status', 'declined', this)">Declined</button>
-                            <button class="filter-btn" onclick="setFilter('status', 'missing', this)">Missing/Zero
-                                '25</button>
-                        </div>
-                        <div class="filter-group">
-                            <span class="filter-label">Pillar:</span>
-                            <select class="filter-select" onchange="setFilter('pillar', this.value)">
-                                <option value="all">All Pillars</option>
-                                <option value="Enable">1. Enable</option>
-                                <option value="Attract">2. Attract</option>
-                                <option value="Grow">3. Grow</option>
-                                <option value="Retain">4. Retain</option>
-                                <option value="Vocational & Technical Skills">5. Voc & Tech Skills</option>
-                                <option value="Global Knowledge Skills">6. Global Knowledge</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th onclick="sortTable('code')">Code ↕</th>
-                            <th onclick="sortTable('name')">Indicator Name ↕</th>
-                            <th id="th-2023" onclick="sortTable('score2023')">2023 ↕</th>
-                            <th id="th-2025" onclick="sortTable('score2025')">2025 ↕</th>
-                            <th id="th-diff" onclick="sortTable('diff')">Change ↕</th>
-                            <th class="sortable" onclick="sortTable('dataOwner')" id="th-dataOwner">Possible Data Owner
-                                (Brunei) <i class="fas fa-sort"></i></th>
-                            <th>Source</th>
-                            <th>Source Website</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Table rows generated by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </main>
-         <!-- INTELLIGENT QUERY INTERFACE -->
- <div style="position: fixed; bottom: 20px; right: 20px; width: 400px; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); z-index: 1000; padding: 20px; font-family: 'Segoe UI', Roboto, sans-serif;">
-  <div style="margin-bottom: 12px;">
-   <h3 style="margin: 0 0 8px 0; color: #0d47a1; font-size: 16px;">📊 Ask About GTCI Data</h3>
-   <input type="text" id="intelligentQueryInput" placeholder="e.g., What's the score for indicator 1.1.1?" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px; box-sizing: border-box;" onkeypress="if(event.key==='Enter') handleQuerySubmit();">
-   <button onclick="handleQuerySubmit()" style="width: 100%; margin-top: 8px; padding: 10px; background: #1976d2; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;">Search</button>
-  </div>
-  <div id="queryResponseBox" style="background: #f5f5f5; border-radius: 6px; padding: 12px; min-height: 40px; font-size: 12px; color: #333; line-height: 1.5; max-height: 300px; overflow-y: auto;">Ready to answer your questions...</div>
-  <div style="margin-top: 8px; font-size: 10px; color: #999;" onclick="this.parentElement.style.display='none'; event.stopPropagation();" style="cursor: pointer;">✕ Close</div>
- </div>
-    </div>
-
-    <script>
-        // --- DATA MODEL ---
-        // Extracted from provided images (2025 Reference & 2023 Reference)
-        const detailedIndicators = [
-            // 1. ENABLE
-            // 1.1 Regulatory Landscape
-            { code: "1.1.1", name: "Government effectiveness", pillar: "Enable", subpillar: "1.1 Regulatory Landscape", score2023: 79.14, score2025: 80.06, source: "World Bank, The Worldwide Governance Indicators, 2024 Update", website: "www.govindicators.org", dataOwner: "Prime Minister's Office (PMO)" },
-            { code: "1.1.2", name: "Rule of law", pillar: "Enable", subpillar: "1.1 Regulatory Landscape", score2023: 68.96, score2025: 73.77, source: "World Bank, The Worldwide Governance Indicators, 2024 Update", website: "www.govindicators.org", dataOwner: "Attorney General's Chambers (AGC)" },
-            { code: "1.1.3", name: "Political stability", pillar: "Enable", subpillar: "1.1 Regulatory Landscape", score2023: 91.56, score2025: 98.60, source: "World Bank, The Worldwide Governance Indicators, 2024 Update", website: "www.govindicators.org", dataOwner: "Internal Security Department (ISD)" },
-            { code: "1.1.4", name: "Regulatory quality", pillar: "Enable", subpillar: "1.1 Regulatory Landscape", score2023: 67.88, score2025: 69.28, source: "World Bank, The Worldwide Governance Indicators, 2024 Update", website: "www.govindicators.org", dataOwner: "Prime Minister's Office (PMO)" },
-            { code: "1.1.5", name: "Corruption", pillar: "Enable", subpillar: "1.1 Regulatory Landscape", score2023: null, score2025: null, source: "Transparency International, The Corruption Perceptions Index 2024", website: "www.transparency.org/research/cpi", dataOwner: "Anti-Corruption Bureau (ACB)" },
-            // 1.2 Market Landscape
-            { code: "1.2.1", name: "Extent of market dominance", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: 30.71, score2025: 39.42, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "Competition Commission Brunei Darussalam (CCBD)" },
-            { code: "1.2.2", name: "Domestic credit to private sector", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: 35.42, score2025: 15.42, source: "International Monetary Fund, International Financial Statistics and World Bank, World Development Indicators", website: "data.worldbank.org", dataOwner: "Brunei Darussalam Central Bank (BDCB)" },
-            { code: "1.2.3", name: "Cluster development", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: 44.47, score2025: 44.29, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "Ministry of Finance and Economy (MOFE)" },
-            { code: "1.2.4", name: "R&D expenditure", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: 5.00, score2025: 4.29, source: "Global Innovation Index Database, WIPO 2025; UNESCO Institute for Statistics; Eurostat; OECD; RICYT", website: "data.uis.unesco.org", dataOwner: "Brunei Research Council (BRC)" },
-            // 1.2.5 Split
-            { code: "1.2.5", name: "ICT Infrastructure", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: 0.00, score2025: null, source: "", website: "", dataOwner: "AITI", indicatorStatus: "replaced", replacedBy: "1.2.5" },
-            { code: "1.2.5", name: "Population covered by at least a 3G mobile network", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: null, score2025: 93.09, source: "International Telecommunication Union, ITU DataHub", website: "datahub.itu.int", dataOwner: "AITI", indicatorStatus: "new" },
-            // 1.2.6
-            { code: "1.2.6", name: "Urbanisation", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: 74.28, score2025: null, source: "World Urbanization Prospects, United Nations", website: "population.un.org/wup", dataOwner: "Dept of Town and Country Planning (TCP)", indicatorStatus: "replaced", replacedBy: "1.2.7" },
-            { code: "1.2.6", name: "Internet access in schools", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: null, score2025: null, source: "UNESCO Institute for Statistics, UIS.Stat", website: "data.uis.unesco.org", dataOwner: "Ministry of Education (MOE)", indicatorStatus: "new" },
-            // 1.2.7
-            { code: "1.2.7", name: "Urbanisation", pillar: "Enable", subpillar: "1.2 Market Landscape", score2023: null, score2025: 75.76, source: "World Urbanization Prospects, United Nations", website: "population.un.org/wup", dataOwner: "Dept of Town and Country Planning (TCP)", indicatorStatus: "code-changed" },
-            // 1.3 Business and Labour Landscape
-            { code: "1.3.1", name: "Labour rights", pillar: "Enable", subpillar: "1.3 Business and Labour Landscape", score2023: null, score2025: 74.20, source: "International Labour Organization, ILOSTAT", website: "ilostat.ilo.org", dataOwner: "Labour Department" },
-            { code: "1.3.2", name: "Labour-employer cooperation", pillar: "Enable", subpillar: "1.3 Business and Labour Landscape", score2023: 51.20, score2025: 60.53, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "Labour Department" },
-            { code: "1.3.3", name: "Professional management", pillar: "Enable", subpillar: "1.3 Business and Labour Landscape", score2023: 42.44, score2025: 60.63, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "Darussalam Enterprise (DARe)" },
-            { code: "1.3.4", name: "Relationship of pay to productivity", pillar: "Enable", subpillar: "1.3 Business and Labour Landscape", score2023: 55.17, score2025: 46.51, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "Manpower Planning and Employment Council (MPEC)" },
-            { code: "1.3.5", name: "Enterprise software", pillar: "Enable", subpillar: "1.3 Business and Labour Landscape", score2023: 11.53, score2025: 11.86, source: "Statista, Technology Market Outlook; World Bank, World Development Indicators", website: "statista.com", dataOwner: "AITI" },
-            { code: "1.3.6", name: "Cloud computing", pillar: "Enable", subpillar: "1.3 Business and Labour Landscape", score2023: 6.76, score2025: 4.79, source: "Statista, Technology Market Outlook; World Bank, World Development Indicators", website: "statista.com", dataOwner: "AITI" },
-            { code: "1.3.7", name: "Firms with website", pillar: "Enable", subpillar: "1.3 Business and Labour Landscape", score2023: null, score2025: null, source: "OECD, ICT Access and Use by Businesses; World Bank, Enterprise Surveys", website: "enterprisesurveys.org", dataOwner: "AITI / DEPS" },
-
-            // 2. ATTRACT
-            // 2.1 External Openness
-            { code: "2.1.1", name: "FDI regulatory restrictiveness", pillar: "Attract", subpillar: "2.1 External Openness", score2023: 61.62, score2025: 54.68, source: "OECD, FDI Regulatory Restrictiveness Index", website: "www.oecd.org/investment/fdiindex.htm", dataOwner: "Brunei Economic Development Board (BEDB)" },
-            { code: "2.1.2", name: "Financial globalisation", pillar: "Attract", subpillar: "2.1 External Openness", score2023: 85.47, score2025: 78.93, source: "KOF Globalisation Index", website: "kof.ethz.ch", dataOwner: "Ministry of Finance and Economy (MOFE)" },
-            { code: "2.1.3", name: "Migrant stock", pillar: "Attract", subpillar: "2.1 External Openness", score2023: 78.84, score2025: 49.50, source: "United Nations Population Division, Trends in International Migrant Stock 2024", website: "un.org/development/desa/pd", dataOwner: "Immigration and National Registration Dept (INRD)" },
-            { code: "2.1.4", name: "International students", pillar: "Attract", subpillar: "2.1 External Openness", score2023: 13.39, score2025: 15.76, source: "UNESCO Institute for Statistics, UIS online database", website: "data.uis.unesco.org", dataOwner: "Ministry of Education (MOE)" },
-            { code: "2.1.5", name: "Brain gain", pillar: "Attract", subpillar: "2.1 External Openness", score2023: null, score2025: 66.32, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "MPEC" },
-            { code: "2.1.6", name: "AI skills migration", pillar: "Attract", subpillar: "2.1 External Openness", score2023: null, score2025: null, source: "OECD.AI Policy Observatory", website: "oecd.ai", dataOwner: "AITI", indicatorStatus: "new" },
-            // 2.2 Internal Openness
-            { code: "2.2.1", name: "Tolerance of minorities", pillar: "Attract", subpillar: "2.2 Internal Openness", score2023: 30.85, score2025: 27.66, source: "The Fund for Peace, Fragile States Index 2024", website: "fragilestatesindex.org", dataOwner: "JAPEM / MORA" },
-            { code: "2.2.2", name: "Tolerance of immigrants", pillar: "Attract", subpillar: "2.2 Internal Openness", score2023: null, score2025: null, source: "Gallup World Poll", website: "gallup.com", dataOwner: "INRD" },
-            { code: "2.2.3", name: "Social mobility", pillar: "Attract", subpillar: "2.2 Internal Openness", score2023: 36.36, score2025: 60.68, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "JAPEM / MPEC" },
-            { code: "2.2.4", name: "Economic empowerment of women", pillar: "Attract", subpillar: "2.2 Internal Openness", score2023: 33.63, score2025: 53.12, source: "World Bank, Women, Business and the Law 2024", website: "wbl.worldbank.org", dataOwner: "JAPEM / Women's Business Council" },
-            { code: "2.2.5", name: "Gender parity in high-skilled jobs", pillar: "Attract", subpillar: "2.2 Internal Openness", score2023: 83.85, score2025: 82.62, source: "International Labour Organization, ILOSTAT", website: "ilostat.ilo.org", dataOwner: "Labour Department / DEPS" },
-            { code: "2.2.6", name: "Leadership opportunities for women", pillar: "Attract", subpillar: "2.2 Internal Openness", score2023: 53.24, score2025: 71.54, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "Review of Women's Status (JAPEM)" },
-
-            // 3. GROW
-            // 3.1 Formal Education
-            { code: "3.1.1", name: "Vocational enrolment", pillar: "Grow", subpillar: "3.1 Formal Education", score2023: 18.17, score2025: 20.87, source: "UNESCO Institute for Statistics, UIS.Stat", website: "data.uis.unesco.org", dataOwner: "IBTE / MOE" },
-            { code: "3.1.2", name: "Tertiary enrolment", pillar: "Grow", subpillar: "3.1 Formal Education", score2023: 20.46, score2025: 20.55, source: "UNESCO Institute for Statistics, UIS online database", website: "data.uis.unesco.org", dataOwner: "MOE (Higher Education)" },
-            { code: "3.1.3", name: "Tertiary education expenditure", pillar: "Grow", subpillar: "3.1 Formal Education", score2023: 86.29, score2025: 50.31, source: "UNESCO Institute for Statistics, UIS.Stat", website: "data.uis.unesco.org", dataOwner: "MOE / MOFE" },
-            { code: "3.1.4", name: "Reading, maths and science", pillar: "Grow", subpillar: "3.1 Formal Education", score2023: 36.31, score2025: 42.06, source: "OECD, Programme for International Student Assessment (PISA)", website: "www.oecd.org/pisa", dataOwner: "MOE (PISA Unit)" },
-            { code: "3.1.5", name: "University ranking", pillar: "Grow", subpillar: "3.1 Formal Education", score2023: 35.36, score2025: 17.53, source: "QS Quacquarelli Symonds Ltd, QS World University Rankings", website: "www.topuniversities.com/world-university-rankings/2024", dataOwner: "UBD / UTB / UNISSA" },
-            // 3.2 Lifelong Learning
-            { code: "3.2.1", name: "Business masters education", pillar: "Grow", subpillar: "3.2 Lifelong Learning", score2023: 0.00, score2025: 0.00, source: "Quacquarelli Symonds Ltd, QS Global MBA and Business Masters Rankings 2025", website: "www.topmba.com", dataOwner: "UBD / UTB" },
-            { code: "3.2.2", name: "Prevalence of training in firms", pillar: "Grow", subpillar: "3.2 Lifelong Learning", score2023: null, score2025: null, source: "World Bank, Enterprise Surveys", website: "enterprisesurveys.org", dataOwner: "MPEC / LLLC" },
-            { code: "3.2.3", name: "Employee development", pillar: "Grow", subpillar: "3.2 Lifelong Learning", score2023: 61.96, score2025: 62.24, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "MPEC" },
-            // 3.3 Access to Growth Opportunities
-            { code: "3.3.1", name: "Delegation of authority", pillar: "Grow", subpillar: "3.3 Access to Growth Opportunities", score2023: 63.34, score2025: 65.69, source: "World Economic Forum, Executive Opinion Survey 2021-2022", website: "reports.weforum.org", dataOwner: "MPEC" },
-            { code: "3.3.2", name: "Youth inclusion", pillar: "Grow", subpillar: "3.3 Access to Growth Opportunities", score2023: 62.04, score2025: 67.31, source: "International Labour Organization, ILOSTAT", website: "ilostat.ilo.org", dataOwner: "Ministry of Culture, Youth and Sports (MCYS)" },
-            { code: "3.3.3", name: "Use of virtual social networks", pillar: "Grow", subpillar: "3.3 Access to Growth Opportunities", score2023: 89.20, score2025: 63.50, source: "We Are Social and Hootsuite, Digital 2025 report series", website: "wearesocial.com/digital-2025", dataOwner: "AITI" },
-            { code: "3.3.4", name: "Use of virtual professional networks", pillar: "Grow", subpillar: "3.3 Access to Growth Opportunities", score2023: 36.47, score2025: 36.47, source: "We Are Social and Hootsuite, Digital 2023 report series", website: "wearesocial.com/digital-2023", dataOwner: "AITI" },
-
-            // 4. RETAIN
-            // 4.1 Sustainability
-            { code: "4.1.1", name: "Pension coverage", pillar: "Retain", subpillar: "4.1 Sustainability", score2023: 100.00, score2025: 100.00, source: "International Labour Organization, Social Security Inquiry (SSI); UN Global SDG Indicators Database", website: "unstats.un.org/sdgs/indicatorsdatabase", dataOwner: "TAP (Employees Trust Fund)" },
-            { code: "4.1.2", name: "Social protection", pillar: "Retain", subpillar: "4.1 Sustainability", score2023: 55.97, score2025: 50.00, source: "World Economic Forum, Executive Opinion Survey 2021-2022", website: "reports.weforum.org", dataOwner: "JAPEM (MCYS)" },
-            { code: "4.1.3", name: "Brain retention", pillar: "Retain", subpillar: "4.1 Sustainability", score2023: 42.74, score2025: 48.17, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "MPEC" },
-            { code: "4.1.4", name: "Environmental performance", pillar: "Retain", subpillar: "4.1 Sustainability", score2023: 45.42, score2025: 48.30, source: "Yale Center for Environmental Law & Policy, 2024 Environmental Performance Index", website: "epi.yale.edu", dataOwner: "JASTRe (Dept of Environment, Parks & Recreation)" },
-            { code: "4.1.5", name: "Vulnerable employment", pillar: "Retain", subpillar: "4.1 Sustainability", score2023: 92.87, score2025: 95.02, source: "World Bank, World Development Indicators; International Labour Organization, ILOSTAT", website: "data.worldbank.org", dataOwner: "Labour Dept / DEPS" },
-            { code: "4.1.6", name: "Protect against future disasters", pillar: "Retain", subpillar: "4.1 Sustainability", score2023: null, score2025: null, source: "Gallup Inc., World Risk Poll Resilience Index", website: "irfoundation.org.uk/wrp/world-risk-poll-data", dataOwner: "NDMC (National Disaster Management Centre)", indicatorStatus: "new" },
-            { code: "4.1.7", name: "Household financial resilience", pillar: "Retain", subpillar: "4.1 Sustainability", score2023: null, score2025: null, source: "Gallup Inc., World Risk Poll Resilience Index", website: "irfoundation.org.uk/wrp/world-risk-poll-data", dataOwner: "MOFE / BDCB", indicatorStatus: "new" },
-            // 4.2 Lifestyle
-            { code: "4.2.1", name: "Personal rights", pillar: "Retain", subpillar: "4.2 Lifestyle", score2023: null, score2025: null, source: "Social Progress Imperative, The Social Progress Index 2025", website: "www.socialprogress.org", dataOwner: "AGC / PMO" },
-            { code: "4.2.2", name: "Personal safety", pillar: "Retain", subpillar: "4.2 Lifestyle", score2023: null, score2025: null, source: "Social Progress Imperative, The Social Progress Index 2025", website: "www.socialprogress.org", dataOwner: "Royal Brunei Police Force (RBPF)" },
-            { code: "4.2.3", name: "Physician density", pillar: "Retain", subpillar: "4.2 Lifestyle", score2023: 29.78, score2025: 27.37, source: "World Health Organization, Global Health Observatory", website: "www.who.int/data/gho", dataOwner: "Ministry of Health (MOH)" },
-            { code: "4.2.4", name: "Sanitation", pillar: "Retain", subpillar: "4.2 Lifestyle", score2023: 95.99, score2025: 98.00, source: "World Health Organization, Global Health Observatory", website: "www.who.int/data/gho", dataOwner: "Ministry of Development (MOD) / MOH" },
-            { code: "4.2.5", name: "Employee wellbeing", pillar: "Retain", subpillar: "4.2 Lifestyle", score2023: null, score2025: null, source: "Gallup World Poll; World Happiness Report 2025", website: "www.gallup.com/analytics/349487/world-happiness-report.aspx", dataOwner: "MOH / MPEC", indicatorStatus: "new" },
-
-            // 5. VOCATIONAL AND TECHNICAL SKILLS
-            // 5.1 Mid-level Skills
-            { code: "5.1.1", name: "Workforce with secondary education", pillar: "Vocational & Technical Skills", subpillar: "5.1 Mid-level Skills", score2023: 73.23, score2025: 62.63, source: "International Labour Organization, ILOSTAT", website: "ilostat.ilo.org", dataOwner: "MOE / Labour Dept" },
-            { code: "5.1.2", name: "Population with secondary education", pillar: "Vocational & Technical Skills", subpillar: "5.1 Mid-level Skills", score2023: null, score2025: 63.94, source: "UNESCO Institute for Statistics, UIS.Stat", website: "data.uis.unesco.org", dataOwner: "DEPS / MOE" },
-            { code: "5.1.3", name: "Technicians and associate professionals", pillar: "Vocational & Technical Skills", subpillar: "5.1 Mid-level Skills", score2023: 50.12, score2025: 57.06, source: "International Labour Organization, ILOSTAT; World Bank, Global Jobs Indicators Database (JOIN)", website: "ilostat.ilo.org", dataOwner: "Labour Dept" },
-            { code: "5.1.4", name: "Labour productivity per employee", pillar: "Vocational & Technical Skills", subpillar: "5.1 Mid-level Skills", score2023: null, score2025: null, source: "The Conference Board, Total Economy Database", website: "www.conference-board.org/data/economydatabase", dataOwner: "DEPS" },
-            // 5.2 Employability
-            { code: "5.2.1", name: "Ease of finding skilled employees", pillar: "Vocational & Technical Skills", subpillar: "5.2 Employability", score2023: 44.76, score2025: 42.88, source: "World Economic Forum, Executive Opinion Survey 2025", website: "reports.weforum.org", dataOwner: "MPEC / JobCentre Brunei" },
-            { code: "5.2.2", name: "Relevance of education system to the economy", pillar: "Vocational & Technical Skills", subpillar: "5.2 Employability", score2023: 63.96, score2025: 60.78, source: "World Economic Forum, Executive Opinion Survey 2021-2022", website: "reports.weforum.org", dataOwner: "MOE / MPEC" },
-            { code: "5.2.3", name: "Skills matching", pillar: "Vocational & Technical Skills", subpillar: "5.2 Employability", score2023: 66.81, score2025: 65.70, source: "International Labour Organization, ILOSTAT", website: "ilostat.ilo.org", dataOwner: "MPEC" },
-            { code: "5.2.4", name: "Highly educated unemployment", pillar: "Vocational & Technical Skills", subpillar: "5.2 Employability", score2023: 84.32, score2025: 83.21, source: "International Labour Organization, ILOSTAT", website: "ilostat.ilo.org", dataOwner: "Labour Dept / MPEC" },
-
-            // 6. GENERALIST ADAPTIVE SKILLS
-            // 6.1 High-level Skills
-            { code: "6.1.1", name: "Workforce with tertiary education", pillar: "Global Knowledge Skills", subpillar: "6.1 High-level Skills", score2023: 27.70, score2025: 35.56, source: "International Labour Organization, ILOSTAT", website: "ilostat.ilo.org", dataOwner: "MOE / Labour Dept" },
-            { code: "6.1.2", name: "Population with tertiary education", pillar: "Global Knowledge Skills", subpillar: "6.1 High-level Skills", score2023: null, score2025: null, source: "UNESCO Institute for Statistics, UIS Stat", website: "http://data.uis.unesco.org/", dataOwner: "Ministry of Education", indicatorStatus: "replaced", replacedBy: "6.1.2 Soft skills" },
-            { code: "6.1.2", name: "Soft skills", pillar: "Global Knowledge Skills", subpillar: "6.1 High-level Skills", score2023: null, score2025: 57.13, source: "World Economic Forum, Executive Opinion Survey 2024", website: "reports.weforum.org", dataOwner: "MPEC", indicatorStatus: "new" },
-            { code: "6.1.3", name: "Professionals", pillar: "Global Knowledge Skills", subpillar: "6.1 High-level Skills", score2023: 34.51, score2025: 33.81, source: "International Labour Organization, ILOSTAT; World Bank, Global Jobs Indicators Database (JOIN)", website: "ilostat.ilo.org", dataOwner: "Labour Dept" },
-            { code: "6.1.4", name: "Researchers", pillar: "Global Knowledge Skills", subpillar: "6.1 High-level Skills", score2023: null, score2025: 4.82, source: "UNESCO Institute for Statistics; Eurostat; OECD Main Science and Technology Indicators (MSTI); RICYT", website: "data.uis.unesco.org", dataOwner: "BRC / UBD / UTB" },
-            { code: "6.1.5", name: "Senior officials and managers", pillar: "Global Knowledge Skills", subpillar: "6.1 High-level Skills", score2023: 38.10, score2025: 45.11, source: "International Labour Organization, ILOSTAT; World Bank, Global Jobs Indicators Database (JOIN)", website: "ilostat.ilo.org", dataOwner: "Labour Dept (JPA)" },
-            { code: "6.1.6", name: "Digital skills", pillar: "Global Knowledge Skills", subpillar: "6.1 High-level Skills", score2023: 100.00, score2025: 100.00, source: "International Telecommunication Union, ITU DataHub", website: "datahub.itu.int", dataOwner: "AITI" },
-            { code: "6.1.7", name: "AI talent concentration", pillar: "Global Knowledge Skills", subpillar: "6.1 High-level Skills", score2023: null, score2025: null, source: "OECD.AI Policy Observatory", website: "oecd.ai", dataOwner: "AITI", indicatorStatus: "new" },
-            // 6.2 Talent Impact
-            { code: "6.2.1", name: "ICT services exports", pillar: "Global Knowledge Skills", subpillar: "6.2 Talent Impact", score2023: null, score2025: 2.44, source: "World Trade Organization and United Nations Conference on Trade and Development, Trade in Commercial Services database", website: "stats.wto.org", dataOwner: "AITI / DEPS", indicatorStatus: "new" },
-            { code: "6.2.2", name: "Mobile apps development", pillar: "Global Knowledge Skills", subpillar: "6.2 Talent Impact", score2023: null, score2025: 43.27, source: "data.ia (Sensor Tower Company); International Monetary Fund, World Economic Outlook Database", website: "www.data.ai", dataOwner: "AITI", indicatorStatus: "new" },
-            { code: "6.2.3", name: "Intellectual property receipts", pillar: "Global Knowledge Skills", subpillar: "6.2 Talent Impact", score2023: null, score2025: 0.00, source: "World Trade Organization and United Nations Conference on Trade and Development, Trade in Commercial Services database", website: "stats.wto.org", dataOwner: "BruIPO (Brunei Intellectual Property Office)", indicatorStatus: "new" },
-            { code: "6.2.4", name: "High-value exports", pillar: "Global Knowledge Skills", subpillar: "6.2 Talent Impact", score2023: 2.24, score2025: 1.53, source: "World Bank, World Development Indicators; United Nations Comtrade database", website: "data.worldbank.org", dataOwner: "DEPS / MOFE", indicatorStatus: "code-changed" },
-            { code: "6.2.5", name: "Software development", pillar: "Global Knowledge Skills", subpillar: "6.2 Talent Impact", score2023: 59.20, score2025: 3.02, source: "GitHub; United Nations, Department of Economic and Social Affairs, Population Division", website: "github.com", dataOwner: "AITI", indicatorStatus: "code-changed" },
-            { code: "6.2.6", name: "New business density", pillar: "Global Knowledge Skills", subpillar: "6.2 Talent Impact", score2023: 5.33, score2025: 0.00, source: "World Bank, Entrepreneurship Database", website: "www.worldbank.org/en/programs/entrepreneurship", dataOwner: "ROCBN (Registry of Companies and Business Names)", indicatorStatus: "code-changed" },
-            { code: "6.2.7", name: "Scientific journal articles", pillar: "Global Knowledge Skills", subpillar: "6.2 Talent Impact", score2023: 24.29, score2025: 32.91, source: "World Bank, World Development Indicators; National Science Foundation, Science and Engineering Indicators", website: "data.worldbank.org", dataOwner: "UBD / UTB / UNISSA", indicatorStatus: "code-changed" }
-        ];
-
-        // NEW: Official Pillar and Sub-pillar Data (2023 & 2025)
-        const pillarDataStructure = [
-            {
-                id: "1", name: "Enable", score2023: 49.43, rank2023: 51, score2025: 56.30, rank2025: 43,
-                subpillars: [
-                    { id: "1.1", name: "Regulatory Landscape", score2023: 76.88, rank2023: 19, score2025: 80.43, rank2025: 15 },
-                    { id: "1.2", name: "Market Landscape", score2023: 37.98, rank2023: 86, score2025: 45.38, rank2025: 82 },
-                    { id: "1.3", name: "Business and Labour Landscape", score2023: 33.42, rank2023: 112, score2025: 43.08, rank2025: 92 }
-                ]
-            },
-            {
-                id: "2", name: "Attract", score2023: 53.71, rank2023: 54, score2025: 56.08, rank2025: 46,
-                subpillars: [
-                    { id: "2.1", name: "External Openness", score2023: 59.83, rank2023: 30, score2025: 53.04, rank2025: 37 },
-                    { id: "2.2", name: "Internal Openness", score2023: 47.59, rank2023: 99, score2025: 59.12, rank2025: 87 }
-                ]
-            },
-            {
-                id: "3", name: "Grow", score2023: 44.35, rank2023: 46, score2025: 39.88, rank2025: 55,
-                subpillars: [
-                    { id: "3.1", name: "Formal Education", score2023: 39.32, rank2023: 51, score2025: 30.27, rank2025: 45 },
-                    { id: "3.2", name: "Lifelong Learning", score2023: 30.98, rank2023: 80, score2025: 31.12, rank2025: 87 },
-                    { id: "3.3", name: "Access to Growth Opportunities", score2023: 62.76, rank2023: 29, score2025: 58.24, rank2025: 44 }
-                ]
-            },
-            {
-                id: "4", name: "Retain", score2023: 65.15, rank2023: 49, score2025: 65.49, rank2025: 39,
-                subpillars: [
-                    { id: "4.1", name: "Sustainability", score2023: 67.40, rank2023: 35, score2025: 68.30, rank2025: 25 },
-                    { id: "4.2", name: "Lifestyle", score2023: 62.89, rank2023: 64, score2025: 62.69, rank2025: 60 }
-                ]
-            },
-            {
-                id: "5", name: "Vocational & Technical Skills", score2023: 63.32, rank2023: 26, score2025: 62.18, rank2025: 33,
-                subpillars: [
-                    { id: "5.1", name: "Mid-level Skills", score2023: 61.67, rank2023: 17, score2025: 61.21, rank2025: 17 },
-                    { id: "5.2", name: "Employability", score2023: 64.96, rank2023: 42, score2025: 63.14, rank2025: 59 }
-                ]
-            },
-            {
-                id: "6", name: "Global Knowledge Skills", score2023: 34.47, rank2023: 45, score2025: 28.98, rank2025: 50,
-                subpillars: [
-                    { id: "6.1", name: "High-level Skills", score2023: 50.08, rank2023: 20, score2025: 46.07, rank2025: 22 },
-                    { id: "6.2", name: "Talent Impact", score2023: 18.87, rank2023: 91, score2025: 11.88, rank2025: 106 }
-                ]
-            }
-        ];
-
-        let indicators = [];
-        let currentSort = { key: 'code', dir: 'asc' };
-        let filters = { status: new Set(), pillar: 'all', search: '' }; // Status is now a Set for multi-select
-        let myChart = null;
-        let isLocked = false;
-        let sidebarCollapsed = false;
-
-        function initIndicators() {
-            indicators = detailedIndicators.map((item, index) => {
-                return {
-                    id: `ind_${index + 1}`,
-                    name: item.name,
-                    code: item.code,
-                    pillar: item.pillar,
-                    subpillar: item.subpillar,
-                    score2023: item.score2023 !== undefined ? item.score2023 : 0,
-                    score2025: item.score2025,
-                    source: item.source || "",
-                    dataOwner: item.dataOwner || "", // Map Data Owner
-                    indicatorStatus: item.indicatorStatus || null, // Map indicator status
-                    replacedBy: item.replacedBy || null, // Map replacement code
-                    remark: item.website || "", // URL mapped to remark field
-                    is2023Only: (item.code === '1.2.5' && item.name === 'ICT Infrastructure') ||
-                        (item.code === '1.2.6' && item.name === 'Urbanisation')
-                };
-            });
-        }
-
-        // --- UI RENDERING ---
-
-        function renderInputs() {
-            const container = document.getElementById('inputContainer');
-            container.innerHTML = '';
-
-            let currentSubpillar = '';
-            let disabledAttr = isLocked ? 'disabled' : '';
-
-            indicators.forEach(ind => {
-                if (ind.subpillar !== currentSubpillar) {
-                    const header = document.createElement('div');
-                    header.className = 'pillar-title';
-                    header.innerHTML = `<small>${ind.pillar}</small>${ind.subpillar.substring(4)}`;
-                    container.appendChild(header);
-                    currentSubpillar = ind.subpillar;
-                }
-
-                const item = document.createElement('div');
-                item.className = 'indicator-item';
-
-                // Handle n/a display
-                const val2025 = ind.score2025 === null ? 'n/a' : ind.score2025;
-                const inputVal2025 = ind.score2025 === null ? '' : ind.score2025;
-                const inputVal2023 = ind.score2023 === null ? '' : ind.score2023;
-
-                item.innerHTML = `
-                <span class="indicator-label"><strong>${ind.code}</strong> ${ind.name}</span>
-                <div class="indicator-inputs">
-                    <div class="input-field">
-                        <label>2023</label>
-                        <input type="number" min="0" max="100" 
-                               value="${inputVal2023}" 
-                               ${disabledAttr}
-                               onchange="updateScore('${ind.id}', '2023', this.value)">
-                    </div>
-                    <div class="input-field">
-                        <label>2025</label>
-                        <input type="number" min="0" max="100" 
-                               value="${inputVal2025}" 
-                               placeholder="n/a"
-                               ${disabledAttr}
-                               onchange="updateScore('${ind.id}', '2025', this.value)">
-                    </div>
-                </div>
-                <div class="indicator-inputs" style="margin-top:0.3rem;">
-                     <div class="input-field" style="flex: 1;">
-                        <input type="text" placeholder="Source..." 
-                               value="${ind.source}" 
-                               ${disabledAttr}
-                               onchange="updateSource('${ind.id}', this.value)">
-                     </div>
-                     <div class="remark-field" style="flex: 1.5;">
-                        <input type="text" placeholder="Website URL..." 
-                               value="${ind.remark}" 
-                               ${disabledAttr}
-                               onchange="updateRemark('${ind.id}', this.value)">
-                     </div>
-                </div>
-            `;
-                container.appendChild(item);
-            });
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-
-            // Determine column visibility based on filters
-            const has2023 = filters.status.has('2023');
-            const has2025 = filters.status.has('2025');
-            const noYearFilters = !has2023 && !has2025;
-
-            // Show column if its specific filter is active OR if no year filters are active (default view)
-            const show2023 = has2023 || noYearFilters;
-            const show2025 = has2025 || noYearFilters;
-            // Show change only if BOTH years are visible (comparison possible) OR if default view
-            const showChange = (has2023 && has2025) || noYearFilters;
-
-            // Update Header Visibility
-            document.getElementById('th-2023').style.display = show2023 ? '' : 'none';
-            document.getElementById('th-2025').style.display = show2025 ? '' : 'none';
-            document.getElementById('th-diff').style.display = showChange ? '' : 'none';
-
-            // Filter
-            let filtered = indicators.filter(ind => {
-                // If either value is null, treat diff as 0 for filtering purposes unless standard handling
-                let s23 = ind.score2023 || 0;
-                let s25 = ind.score2025 === null ? 0 : ind.score2025;
-                const diff = s25 - s23;
-
-                // Status Filter Logic:
-                // Split selected filters into two groups: Trend (Improved, Declined, Missing) and Year (2023, 2025).
-                // Logic: (Match ANY selected Trend OR no Trend selected) AND (Match ANY selected Year OR no Year selected)
-
-                if (filters.status.size > 0) {
-                    const selectedTrends = new Set();
-                    const selectedYears = new Set();
-
-                    if (filters.status.has('improved')) selectedTrends.add('improved');
-                    if (filters.status.has('declined')) selectedTrends.add('declined');
-                    if (filters.status.has('missing')) selectedTrends.add('missing');
-
-                    if (filters.status.has('2023')) selectedYears.add('2023');
-                    if (filters.status.has('2025')) selectedYears.add('2025');
-
-                    // Check Trend Match
-                    let trendMatch = false;
-                    if (selectedTrends.size === 0) {
-                        trendMatch = true; // No trend filters applied, pass all
-                    } else {
-                        if (selectedTrends.has('improved') && ind.score2025 !== null && ind.score2023 !== null && diff > 0) trendMatch = true;
-                        if (selectedTrends.has('declined') && ind.score2025 !== null && ind.score2023 !== null && diff < 0) trendMatch = true;
-                        if (selectedTrends.has('missing') && !ind.is2023Only && (ind.score2025 === null || ind.score2025 === 0) && (ind.indicatorStatus === 'new' || ind.indicatorStatus === 'code changed' || (ind.code === '6.2.6' && ind.indicatorStatus === 'code-changed') || !ind.indicatorStatus)) trendMatch = true;
-                    }
-
-                    // Check Year Match
-                    let yearMatch = false;
-                    if (selectedYears.size === 0) {
-                        yearMatch = true; // No year filters applied, pass all
-                    } else {
-                        // Year-specific filtering:
-                        // - 2023: Show only 69 indicators (exclude new and code changed indicators)
-                        // - 2025: Show only 77 indicators (exclude replaced indicators)
-                        if (selectedYears.has('2023')) {
-                            // Show only if the indicator exists in 2023 (not new, not code changed)
-                            if (ind.indicatorStatus !== 'new' && ind.indicatorStatus !== 'code changed') yearMatch = true;
-                        }
-                        if (selectedYears.has('2025')) {
-                            // Show only if the indicator exists in 2025 (not replaced)
-                            if (ind.indicatorStatus !== 'replaced') yearMatch = true;
-                        }
-                    }
-
-                    if (!trendMatch || !yearMatch) return false;
-                }
-
-                if (filters.pillar !== 'all' && ind.pillar !== filters.pillar) return false;
-
-                // Search Filter
-                if (filters.search) {
-                    const query = filters.search.toLowerCase();
-                    const matchCode = ind.code.toLowerCase().includes(query);
-                    const matchName = ind.name.toLowerCase().includes(query);
-                    if (!matchCode && !matchName) return false;
-                }
-
-                return true;
-            });
-
-            // Sort
-            filtered.sort((a, b) => {
-                let valA, valB;
-                if (currentSort.key === 'diff') {
-                    valA = (a.score2025 || 0) - (a.score2023 || 0);
-                    valB = (b.score2025 || 0) - (b.score2023 || 0);
-                } else if (currentSort.key === 'code') {
-                    valA = a.code; valB = b.code;
-                } else {
-                    valA = a[currentSort.key]; valB = b[currentSort.key];
-                }
-                if (valA < valB) return currentSort.dir === 'asc' ? -1 : 1;
-                if (valA > valB) return currentSort.dir === 'asc' ? 1 : -1;
-                return 0;
-            });
-
-            // Update Counter
-            const counterEl = document.getElementById('indicatorCount');
-            if (counterEl) {
-                counterEl.textContent = `(${filtered.length})`;
-            }
-
-            filtered.forEach(ind => {
-                const s23 = ind.score2023 === null ? 'n/a' : ind.score2023;
-                const s25 = ind.score2025;
-
-                let diffStr = '--';
-                let trendClass = 'trend-neutral';
-                let trendIcon = '';
-
-                if (s25 !== null && ind.score2023 !== null) {
-                    const diff = (s25 - ind.score2023).toFixed(1);
-                    if (diff > 0) { trendClass = 'trend-up'; trendIcon = '↑'; diffStr = '+' + diff; }
-                    else if (diff < 0) { trendClass = 'trend-down'; trendIcon = '↓'; diffStr = diff; }
-                    else { diffStr = '0.0'; trendIcon = '→'; }
-                }
-
-                const tr = document.createElement('tr');
-
-                // Badge logic
-                let badgeHTML = '';
-                if (ind.indicatorStatus === 'replaced') {
-                    const replacementText = ind.replacedBy ? ` by ${ind.replacedBy}` : '';
-                    badgeHTML = `<span class="indicator-badge badge-replaced">Replaced${replacementText}</span>`;
-                } else if (ind.indicatorStatus === 'new') {
-                    badgeHTML = '<span class="indicator-badge badge-new">New</span>';
-                } else if (ind.indicatorStatus === 'code-changed') {
-                    badgeHTML = '<span class="indicator-badge badge-code-changed">Code Changed</span>';
-                }
-
-                let html = `
-                <td style="font-weight:600; font-size:0.9rem;">${ind.code}${badgeHTML}</td>
-                <td>${ind.name}</td>`;
-
-                if (show2023) {
-                    html += `<td class="score-cell">${s23}</td>`;
-                }
-                if (show2025) {
-                    html += `<td class="score-cell">${s25 === null ? 'n/a' : s25}</td>`;
-                }
-                if (showChange) {
-                    html += `<td class="score-cell ${trendClass}">
-                    ${diffStr} <span class="trend-icon">${trendIcon}</span>
-                </td>`;
-                }
-
-                html += `
-                <td>${ind.dataOwner}</td>
-                <td class="source-cell" title="${ind.source}">${ind.source}</td>
-                <td class="remark-cell"><a href="https://${ind.remark}" target="_blank">${ind.remark}</a></td>
-            `;
-                tr.innerHTML = html;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateSummary() {
-            // Calculate averages (ignoring n/a)
-            const valid2025 = indicators.filter(i => i.score2025 !== null);
-            const valid2023 = indicators.filter(i => i.score2023 !== null);
-            const sum2023 = valid2023.reduce((acc, curr) => acc + Number(curr.score2023), 0);
-            const sum2025 = valid2025.reduce((acc, curr) => acc + Number(curr.score2025), 0);
-
-            const count2025 = valid2025.length;
-            const count2023 = valid2023.length;
-
-            const avg23 = "51.74";
-            const avg25 = "51.48";
-
-            const change = (avg25 !== '--' && avg23 !== '--') ? (avg25 - avg23).toFixed(2) : 0;
-
-            document.getElementById('displayScore2023').textContent = avg23;
-            document.getElementById('displayScore2025').textContent = avg25;
-
-            const scoreDiffEl = document.getElementById('scoreDiff');
-            scoreDiffEl.textContent = (change > 0 ? '▲ ' : (change < 0 ? '▼ ' : '')) + Math.abs(change);
-            scoreDiffEl.style.color = change > 0 ? '#b9f6ca' : (change < 0 ? '#ffcdd2' : 'white');
-
-            const netChangeEl = document.getElementById('netChange');
-            const netTrendEl = document.getElementById('netTrend');
-
-            netChangeEl.textContent = (change > 0 ? '+' : '') + change;
-
-            if (change > 0) {
-                netChangeEl.style.color = 'var(--success)';
-                netTrendEl.innerHTML = '<span class="trend-up">↑ Improved</span>';
-            } else if (change < 0) {
-                netChangeEl.style.color = 'var(--danger)';
-                netTrendEl.innerHTML = '<span class="trend-down">↓ Declined</span>';
-            } else {
-                netChangeEl.style.color = 'var(--neutral)';
-                netTrendEl.innerHTML = '<span class="trend-neutral">→ Stable</span>';
-            }
-
-            // Scorecard Logic: Tally must equal 77 (Total indicators excluding 2023-only legacy items)
-            // Universe = All indicators valid for 2025 context (excluding replaced indicators)
-            const universe = indicators.filter(i => !i.is2023Only && i.indicatorStatus !== 'replaced');
-
-            // Explicitly classify (replaced indicators are excluded from these counts)
-            const improved = universe.filter(i => i.score2025 !== null && i.score2023 !== null && (i.score2025 - i.score2023) > 0).length;
-            const declined = universe.filter(i => i.score2025 !== null && i.score2023 !== null && (i.score2025 - i.score2023) < 0).length;
-
-            // STRICT Missing/Zero Data (2025): Score is null or 0
-            const missing = universe.filter(i => i.score2025 === null || i.score2025 === 0).length;
-
-            document.getElementById('improvedCount').textContent = improved;
-            document.getElementById('declinedCount').textContent = declined;
-            document.getElementById('missingCount').textContent = missing;
-        }
-
-        function updateRank() {
-            const r23 = document.getElementById('rank2023Input').value;
-            const r25 = document.getElementById('rank2025Input').value;
-            const diff = r23 - r25;
-
-            document.getElementById('displayRank2023').textContent = r23;
-            document.getElementById('displayRank2025').textContent = r25;
-
-            const diffEl = document.getElementById('rankDiff');
-            if (diff > 0) {
-                diffEl.textContent = '▲ ' + Math.abs(diff);
-                diffEl.style.color = '#b9f6ca';
-            } else if (diff < 0) {
-                diffEl.textContent = '▼ ' + Math.abs(diff);
-                diffEl.style.color = '#ffcdd2';
-            } else {
-                diffEl.textContent = '-';
-                diffEl.style.color = 'white';
-            }
-        }
-
-        // --- CHARTS ---
-
-        function renderChart() {
-            const ctx = document.getElementById('comparisonChart').getContext('2d');
-            const pillars = ["Enable", "Attract", "Grow", "Retain", "Vocational & Technical Skills", "Global Knowledge Skills"];
-
-            const pillarColors = [
-                '#e91e63', // Enable
-                '#9c27b0', // Attract
-                '#673ab7', // Grow
-                '#03a9f4', // Retain
-                '#009688', // Voc Skills
-                '#ff9800'  // Global Knowledge
-            ];
-
-            const pillarData = pillars.map(p => {
-                // OLD CALCULATION:
-                // const inds = indicators.filter(i => i.pillar === p && i.score2025 !== null && i.score2023 !== null);
-                // const avg23 = inds.length ? inds.reduce((a, b) => a + Number(b.score2023), 0) / inds.length : 0;
-                // const avg25 = inds.length ? inds.reduce((a, b) => a + Number(b.score2025), 0) / inds.length : 0;
-
-                // NEW: Use official structure
-                const pillarObj = pillarDataStructure.find(pd => pd.name === p);
-                if (pillarObj) {
-                    return { pillar: p, score2023: pillarObj.score2023, score2025: pillarObj.score2025 };
-                }
-                return { pillar: p, score2023: 0, score2025: 0 };
-            });
-
-            const data2023 = pillarData.map(d => d.score2023);
-            const data2025 = pillarData.map(d => d.score2025);
-
-            if (myChart) {
-                myChart.data.datasets[0].data = data2023;
-                myChart.data.datasets[1].data = data2025;
-                myChart.update();
-            } else {
-                myChart = new Chart(ctx, {
-                    plugins: [ChartDataLabels],
-                    type: 'bar',
-                    data: {
-                        labels: pillars.map(p => p.split(' ')[0]),
-                        datasets: [
-                            {
-                                label: '2023',
-                                data: data2023,
-                                backgroundColor: '#CFD8DC', // Light Grey
-                                borderRadius: 4
-                            },
-                            {
-                                label: '2025',
-                                data: data2025,
-                                backgroundColor: '#90CAF9', // Light Blue
-                                borderRadius: 4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: true },
-                            title: { display: true, text: 'Score Comparison by Pillar' },
-                            datalabels: {
-                                anchor: 'end',
-                                align: 'top',
-                                formatter: Math.round,
-                                font: {
-                                    weight: 'bold'
-                                },
-                                color: '#333',
-                                formatter: function (value, context) {
-                                    return value.toFixed(2);
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 110 // Increase max slightly to fit labels
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        let myRadarChart = null;
-
-        function renderRadarChart() {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            const pillars = ["Enable", "Attract", "Grow", "Retain", "Vocational & Technical Skills", "Global Knowledge Skills"];
-
-            const pillarData = pillars.map(p => {
-                const pillarObj = pillarDataStructure.find(pd => pd.name === p);
-                if (pillarObj) {
-                    return { pillar: p, score2023: pillarObj.score2023, score2025: pillarObj.score2025 };
-                }
-                return { pillar: p, score2023: 0, score2025: 0 };
-            });
-
-            const data2023 = pillarData.map(d => d.score2023);
-            const data2025 = pillarData.map(d => d.score2025);
-
-            if (myRadarChart) {
-                myRadarChart.data.datasets[0].data = data2023;
-                myRadarChart.data.datasets[1].data = data2025;
-                myRadarChart.update();
-            } else {
-                myRadarChart = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: pillars.map(p => p.split(' ')[0]), // Short labels
-                        datasets: [
-                            {
-                                label: '2023',
-                                data: data2023,
-                                fill: true,
-                                backgroundColor: 'rgba(207, 216, 220, 0.2)',
-                                borderColor: '#CFD8DC',
-                                pointBackgroundColor: '#CFD8DC',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: '#CFD8DC'
-                            },
-                            {
-                                label: '2025',
-                                data: data2025,
-                                fill: true,
-                                backgroundColor: 'rgba(144, 202, 249, 0.2)',
-                                borderColor: '#90CAF9',
-                                pointBackgroundColor: '#90CAF9',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: '#90CAF9'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: true },
-                            title: { display: true, text: 'Radar Comparison' },
-                            datalabels: { display: false } // Disable data labels for radar chart
-                        },
-                        scales: {
-                            r: {
-                                beginAtZero: true,
-                                max: 100,
-                                ticks: { backdropColor: 'transparent' }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        // --- INTERACTION ---
-
-        function updateScore(id, year, value) {
-            const item = indicators.find(i => i.id === id);
-            if (item) {
-                item['score' + year] = value === '' ? null : Number(value);
-                updateDashboard();
-            }
-        }
-
-        function updateRemark(id, value) {
-            const item = indicators.find(i => i.id === id);
-            if (item) {
-                item.remark = value;
-            }
-        }
-
-        function updateSource(id, value) {
-            const item = indicators.find(i => i.id === id);
-            if (item) {
-                item.source = value;
-                // Optional: re-render table if needed, or just keep sync
-            }
-        }
-
-        function updateDashboard() {
-            updateSummary();
-            renderTable();
-            renderChart();
-            renderRadarChart();
-        }
-
-        function resetData() {
-            if (!confirm("Clear all data?")) return;
-            indicators.forEach(ind => {
-                ind.score2023 = null;
-                ind.score2025 = null;
-                ind.remark = "";
-            });
-            renderInputs();
-            updateDashboard();
-        }
-
-        function sortTable(key) {
-            if (currentSort.key === key) {
-                currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.key = key;
-                currentSort.dir = 'asc';
-            }
-            renderTable();
-        }
-
-        function setFilter(type, value, btnInfo) {
-            if (type === 'search') {
-                filters.search = value.toLowerCase();
-            } else if (type === 'pillar') {
-                filters.pillar = value;
-            } else if (type === 'status') {
-                // Reset to 'all' logic if value is 'all'
-                if (value === 'all') {
-                    filters.status.clear();
-                } else {
-                    // Toggle
-                    if (filters.status.has(value)) {
-                        filters.status.delete(value);
-                    } else {
-                        filters.status.add(value);
-                    }
-                }
-
-                // Update UI classes
-                const btns = document.querySelectorAll('.filter-btn');
-                btns.forEach(btn => {
-                    // Get 'onclick' attribute string to check identifier, or better, add data-values to btns.
-                    // For now, rely on text content or manual check for simplicity since we used inline onclick.
-                    // Let's infer the value from the onclick string for this simple app.
-                    const onclickStr = btn.getAttribute('onclick');
-
-                    if (onclickStr.includes("'all'") && filters.status.size === 0) {
-                        btn.classList.add('active');
-                    } else if (onclickStr.includes(`'${value}'`)) {
-                        // This is the button clicked, or related. 
-                    }
-
-                    // Re-eval active state for ALL buttons
-                    if (onclickStr.includes("'status'")) {
-                        const valMatch = onclickStr.match(/'([^']+)'\s*,\s*this/); // Regex to find value passed to setFilter(..., 'val', this)
-                        // This regex is tricky. Let's use a simpler approach:
-                        // Just clear all active, then re-add based on set state.
-                        btn.classList.remove('active');
-
-                        // Extract value manually
-                        let val = '';
-                        if (onclickStr.includes("'all'")) val = 'all';
-                        if (onclickStr.includes("'2023'")) val = '2023';
-                        if (onclickStr.includes("'2025'")) val = '2025';
-                        if (onclickStr.includes("'improved'")) val = 'improved';
-                        if (onclickStr.includes("'declined'")) val = 'declined';
-                        if (onclickStr.includes("'missing'")) val = 'missing';
-
-                        if (val === 'all' && filters.status.size === 0) {
-                            btn.classList.add('active');
-                        } else if (filters.status.has(val)) {
-                            btn.classList.add('active');
-                        }
-                    }
-                });
-            }
-            renderTable();
-        }
-
-        function toggleLock() {
-            isLocked = !isLocked;
-            const btn = document.getElementById('lockBtn');
-            const icon = document.getElementById('lockIcon');
-            const text = document.getElementById('lockText');
-
-            if (isLocked) {
-                btn.classList.add('btn-primary');
-                btn.classList.remove('btn-outline');
-                icon.textContent = '🔒';
-                text.textContent = 'Locked';
-            } else {
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-outline');
-                icon.textContent = '🔓';
-                text.textContent = 'Unlock';
-            }
-            renderInputs(); // Re-render to apply disabled state
-        }
-
-        function toggleSidebar() {
-            sidebarCollapsed = !sidebarCollapsed;
-            const sidebar = document.getElementById('sidebar');
-            if (sidebarCollapsed) {
-                sidebar.classList.add('collapsed');
-            } else {
-                sidebar.classList.remove('collapsed');
-            }
-        }
-
-
-         // ===== INTELLIGENT QUERY SYSTEM =====
-         function executeQuery() { const q = document.getElementById('queryInput').value.toLowerCase().trim(); if(!q) { alert('Please enter a query'); return; } displayQueryResponse(processQuery(q)); }
-         function clearQueryResponse() { document.getElementById('queryResponse').style.display = 'none'; document.getElementById('queryInput').value = ''; }
-         function suggestedQuery(type) { const queries = { improved: 'How many indicators improved from 2023 to 2025?', declined: 'Which indicators declined?', data_owners: 'Which ministries manage GTCI indicators?', sources: 'List all data sources used', ministries: 'What government departments provide data?', missing: 'Which indicators have no 2025 data?' }; document.getElementById('queryInput').value = queries[type] || ''; executeQuery(); }
-         function processQuery(q) { let result = { title: 'Query Results', content: 'N/A' }; if(q.includes('improve')) { result = generateImprovedReport(); } else if(q.includes('decline')) { result = generateDeclinedReport(); } else if(q.includes('miss') || q.includes('no data')) { result = generateMissingReport(); } else if(q.includes('source') || q.includes('database')) { result = generateSourceReport(); } else if(q.includes('ministry') || q.includes('department') || q.includes('owner')) { result = generateMinistryReport(); } else { result = generateGeneralReport(q); } return result; }
-         function generateImprovedReport() { const improved = indicators.filter(i => i.score2025 !== null && i.score2023 !== null && (i.score2025 - i.score2023) > 0); const content = `<div style="margin: 1rem 0;"><strong>Total Improved:</strong> <span style="font-size: 1.8rem; color: #2e7d32;">${improved.length}</span> indicators</div><table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;"><tr style="background: #f5f5f5;"><th style="padding: 0.5rem; border-bottom: 1px solid #ddd;">Code</th><th style="padding: 0.5rem; border-bottom: 1px solid #ddd;">Name</th><th style="padding: 0.5rem; border-bottom: 1px solid #ddd;">2023 → 2025</th><th style="padding: 0.5rem; border-bottom: 1px solid #ddd;">Change</th></tr>${improved.slice(0,5).map(i => `<tr style="border-bottom: 1px solid #eee;"><td style="padding: 0.5rem;">${i.code}</td><td style="padding: 0.5rem;">${i.name}</td><td style="padding: 0.5rem;">${i.score2023} → ${i.score2025}</td><td style="padding: 0.5rem; color: #2e7d32;">+${(i.score2025 - i.score2023).toFixed(2)}</td></tr>`).join('')}</table>${improved.length > 5 ? `<p style="margin-top: 0.5rem; color: #666; font-size: 0.8rem;">... and ${improved.length - 5} more</p>` : ''}`; return { title: '✅ Improved Indicators', content }; }
-         function generateDeclinedReport() { const declined = indicators.filter(i => i.score2025 !== null && i.score2023 !== null && (i.score2025 - i.score2023) < 0); const content = `<div style="margin: 1rem 0;"><strong>Total Declined:</strong> <span style="font-size: 1.8rem; color: #c62828;">${declined.length}</span> indicators</div><table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;"><tr style="background: #f5f5f5;"><th style="padding: 0.5rem; border-bottom: 1px solid #ddd;">Code</th><th style="padding: 0.5rem; border-bottom: 1px solid #ddd;">Name</th><th style="padding: 0.5rem; border-bottom: 1px solid #ddd;">2023 → 2025</th><th style="padding: 0.5rem; border-bottom: 1px solid #ddd;">Change</th></tr>${declined.slice(0,5).map(i => `<tr><td style="padding: 0.5rem;">${i.code}</td><td style="padding: 0.5rem;">${i.name}</td><td style="padding: 0.5rem;">${i.score2023} → ${i.score2025}</td><td style="padding: 0.5rem; color: #c62828;">${(i.score2025 - i.score2023).toFixed(2)}</td></tr>`).join('')}</table>${declined.length > 5 ? `<p style="margin-top: 0.5rem; color: #666; font-size: 0.8rem;">... and ${declined.length - 5} more</p>` : ''}`; return { title: '⚠️ Declined Indicators', content }; }
-         function generateMissingReport() { const missing = indicators.filter(i => !i.is2023Only && i.indicatorStatus !== 'replaced' && (i.score2025 === null || i.score2025 === 0)); const content = `<div style="margin: 1rem 0;"><strong>Missing Data (2025):</strong> <span style="font-size: 1.8rem; color: #f57c00;">${missing.length}</span> indicators with N/A or 0 values</div><p style="color: #666; font-size: 0.9rem; margin-top: 1rem;">These indicators require data collection or are marked as 'new' in the 2025 framework.</p>`; return { title: '❌ Missing or Zero Data', content }; }
-         function generateSourceReport() { const sources = [...new Set(indicators.filter(i => i.source).map(i => i.source))]; const sourceCount = {}; indicators.forEach(i => { if(i.source) { sourceCount[i.source] = (sourceCount[i.source] || 0) + 1; } }); const topSources = Object.entries(sourceCount).sort((a,b) => b[1] - a[1]).slice(0, 10); const content = `<div style="margin: 1rem 0;"><strong>Total Unique Data Sources:</strong> <span style="font-size: 1.8rem; color: #1976d2;">${sources.length}</span></div><p style="color: #666; margin-top: 1rem; font-weight: 600;">Top 10 Data Sources by Indicator Count:</p><ol style="margin-left: 1.5rem; color: #333;">${topSources.map((s,i) => `<li style="margin: 0.5rem 0;"><strong>${s[0]}</strong> (${s[1]} indicators)</li>`).join('')}</ol>`; return { title: '📚 Data Sources Report', content }; }
-         function generateMinistryReport() { const ministries = {}; indicators.forEach(i => { if(i.dataOwner) { ministries[i.dataOwner] = (ministries[i.dataOwner] || 0) + 1; } }); const sorted = Object.entries(ministries).sort((a,b) => b[1] - a[1]); const content = `<div style="margin: 1rem 0;"><strong>Government Departments/Ministries:</strong> <span style="font-size: 1.8rem; color: #7b1fa2;">${sorted.length}</span> agencies</div><p style="color: #666; margin-top: 1rem; font-weight: 600;">Breakdown by Agency:</p><ul style="margin-left: 1.5rem; color: #333;">${sorted.slice(0,15).map(m => `<li style="margin: 0.5rem 0;"><strong>${m[0]}</strong> - <span style="color: #1976d2;">${m[1]} indicators</span></li>`).join('')}</ul>${sorted.length > 15 ? `<p style="margin-top: 0.5rem; color: #666; font-size: 0.8rem;">... and ${sorted.length - 15} more</p>` : ''}`; return { title: '🏂 Government Agencies Responsible', content }; }
-         function generateGeneralReport(q) { const matchedIndicators = indicators.filter(i => i.name.toLowerCase().includes(q) || i.code.toLowerCase().includes(q)).slice(0, 5); const content = matchedIndicators.length ? `<p style="color: #666; margin-bottom: 1rem;">Found ${matchedIndicators.length} indicator(s) matching "<strong>${q}</strong>":</p><ul style="margin-left: 1.5rem;">${matchedIndicators.map(i => `<li style="margin: 0.5rem 0;"><strong>${i.code}</strong>: ${i.name}<br/><small style="color: #999;">Owner: ${i.dataOwner || 'N/A'}</small></li>`).join('')}</ul>` : `<p style="color: #999;">No indicators found matching "${q}". Try searching by code (e.g., 1.1.1) or keyword.</p>`; return { title: '🔍 Search Results', content }; }
-         function displayQueryResponse(result) { const respDiv = document.getElementById('queryResponse'); const titleEl = document.getElementById('queryTitle'); const contentEl = document.getElementById('responseContent'); titleEl.textContent = result.title || 'Query Results'; contentEl.innerHTML = result.content || 'No results found'; respDiv.style.display = 'block'; respDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-        
-        // Init
-        initIndicators();
-        renderInputs();
-        updateDashboard();
-        updateRank();
-        
- // ===== INTELLIGENT QUERY ENGINE =====
- function parseQuery(query) {
-   query = query.toLowerCase().trim();
-   const patterns = {
-     indicatorScore: /score|value|1\.[0-9]|2\.[0-9]|3\.[0-9]|4\.[0-9]|5\.[0-9]|6\.[0-9]/i,
-     pillarScore: /enable|attract|grow|retain|vocational|global knowledge/i,
-     improved: /improve|increase|better|gain|up/i,
-     declined: /declin|decrease|worse|loss|down/i,
-     comparison: /compare|vs|change/i,
-     summary: /summary|overview|status|dashboard/i,
-     missingData: /missing|null|n\/a|zero|available/i
-   };
-   const intent = Object.keys(patterns).find(key => patterns[key].test(query));
-   const codeMatch = query.match(/([0-9]+\.[0-9]+\.[0-9]+|[0-9]+\.[0-9]+)/);
-   const code = codeMatch ? codeMatch[1] : null;
-   const pillars = ['enable', 'attract', 'grow', 'retain', 'vocational', 'global knowledge', 'skills'];
-   const pillar = pillars.find(p => query.includes(p));
-   return { intent, code, pillar, originalQuery: query };
- }
- 
- function generateResponse(parseResult) {
-   const { intent, code, pillar } = parseResult;
-   let response = '';
-   try {
-     if (intent === 'indicatorScore' && code) {
-       const indicator = indicators.find(i => i.code === code);
-       if (indicator) {
-         response = `<strong>Indicator ${code}: ${indicator.name}</strong><br>`;
-         response += `Pillar: ${indicator.pillar}<br>`;
-         response += `2023 Score: ${indicator.score2023 !== null ? indicator.score2023 : 'N/A'}<br>`;
-         response += `2025 Score: ${indicator.score2025 !== null ? indicator.score2025 : 'N/A'}<br>`;
-         if (indicator.score2023 !== null && indicator.score2025 !== null) {
-           const diff = (indicator.score2025 - indicator.score2023).toFixed(2);
-           const trend = diff > 0 ? ' ↑ Improved' : diff < 0 ? ' ↓ Declined' : ' → Stable';
-           response += `Change: ${diff}${trend}<br>`;
-         }
-         response += `Data Owner: ${indicator.dataOwner || 'N/A'}`;
-       } else {
-         response = `No indicator found with code ${code}`;
-       }
-     } else if (intent === 'pillarScore' && pillar) {
-       const fullPillar = pillar.includes('vocational') ? 'Vocational & Technical Skills' : pillar.includes('global') ? 'Global Knowledge Skills' : pillar.charAt(0).toUpperCase() + pillar.slice(1);
-       const pillarObj = pillarDataStructure.find(p => p.name === fullPillar);
-       if (pillarObj) {
-         response = `<strong>${fullPillar}</strong><br>`;
-         response += `2023 - Score: ${pillarObj.score2023}, Rank: ${pillarObj.rank2023}<br>`;
-         response += `2025 - Score: ${pillarObj.score2025}, Rank: ${pillarObj.rank2025}<br>`;
-         const diff = (pillarObj.score2025 - pillarObj.score2023).toFixed(2);
-         const trend = diff > 0 ? ' ↑ Improved' : diff < 0 ? ' ↓ Declined' : ' → Stable';
-         response += `Change: ${diff}${trend}`;
-       } else {
-         response = `Pillar "${pillar}" not found`;
-       }
-     } else if (intent === 'improved') {
-       const improvedInds = indicators.filter(i => i.score2025 !== null && i.score2023 !== null && (i.score2025 - i.score2023) > 0).slice(0, 5);
-       response = `<strong>Top 5 Improved Indicators:</strong><br>`;
-       improvedInds.forEach(ind => {
-         const diff = (ind.score2025 - ind.score2023).toFixed(2);
-         response += `${ind.code} - ${ind.name}: +${diff}<br>`;
-       });
-       response += `Total improved: ${improvedInds.length}`;
-     } else if (intent === 'declined') {
-       const declinedInds = indicators.filter(i => i.score2025 !== null && i.score2023 !== null && (i.score2025 - i.score2023) < 0).slice(0, 5);
-       response = `<strong>Top 5 Declined Indicators:</strong><br>`;
-       declinedInds.forEach(ind => {
-         const diff = (ind.score2025 - ind.score2023).toFixed(2);
-         response += `${ind.code} - ${ind.name}: ${diff}<br>`;
-       });
-       response += `Total declined: ${declinedInds.length}`;
-     } else if (intent === 'comparison') {
-       response = `<strong>2023 vs 2025 Comparison</strong><br>`;
-       response += `Global Rank: 41 → 43 (↓ -2)<br>`;
-       response += `Global Score: 51.74 → 51.48 (↓ -0.26)<br>`;
-       response += `Improved Indicators: 27<br>`;
-       response += `Declined Indicators: 35<br>`;
-       response += `Missing/Zero Data: 15`;
-     } else if (intent === 'missingData') {
-       const missingInds = indicators.filter(i => i.score2025 === null || i.score2025 === 0).slice(0, 8);
-       response = `<strong>Indicators with Missing 2025 Data (${missingInds.length} shown):</strong><br>`;
-       missingInds.forEach(ind => {
-         response += `${ind.code} - ${ind.name}<br>`;
-       });
-     } else if (intent === 'summary') {
-       response = `<strong>GTCI Dashboard Summary</strong><br>`;
-       response += `Global Rank: 41 (2023) → 43 (2025)<br>`;
-       response += `Global Score: 51.74 → 51.48<br>`;
-       response += `6 Pillars Tracked<br>`;
-       response += `83 Total Indicators<br>`;
-       response += `Improved: 27 | Declined: 35 | Missing: 15`;
-     } else {
-       response = `Try asking:<br>• What's the score for indicator 1.1.1?<br>• How is the Enable pillar performing?<br>• Show improved indicators<br>• Which indicators declined?<br>• Compare 2023 vs 2025<br>• Show missing data<br>• Dashboard summary`;
-     }
-   } catch (e) {
-     response = `Error: ${e.message}`;
-   }
-   return response;
- }
- 
- function handleQuerySubmit() {
-   const queryInput = document.getElementById('intelligentQueryInput');
-   const query = queryInput.value.trim();
-   if (!query) return;
-   const responseBox = document.getElementById('queryResponseBox');
-   const parseResult = parseQuery(query);
-   const response = generateResponse(parseResult);
-   responseBox.innerHTML = response;
-   queryInput.value = '';
- }
-
-    </script>
-
-</body>
-
-</html>
