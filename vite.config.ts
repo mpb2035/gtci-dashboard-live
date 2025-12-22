@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: '/gtci-dashboard-testsite/',
+  base: './',
   server: {
     host: "::",
     port: 8080,
