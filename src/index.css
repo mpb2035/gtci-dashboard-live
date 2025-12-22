@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* GTCI Dashboard Design System */
+
+@layer base {
+  :root {
+    /* Primary - Deep professional blue */
+    --primary: 213 89% 21%;
+    --primary-foreground: 210 40% 98%;
+    
+    /* Secondary - Light blue accent */
+    --secondary: 210 79% 46%;
+    --secondary-foreground: 210 40% 98%;
+    
+    /* Accent - Bright blue for interactive elements */
+    --accent: 207 90% 61%;
+    --accent-foreground: 213 89% 21%;
+    
+    /* Backgrounds */
+    --background: 216 25% 96%;
+    --foreground: 220 15% 20%;
+    
+    /* Cards and surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 20%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 20%;
+    
+    /* Muted */
+    --muted: 210 20% 93%;
+    --muted-foreground: 215 16% 47%;
+    
+    /* Semantic colors */
+    --success: 142 71% 29%;
+    --success-foreground: 0 0% 100%;
+    
+    --danger: 0 72% 51%;
+    --danger-foreground: 0 0% 100%;
+    
+    --warning: 36 100% 50%;
+    --warning-foreground: 0 0% 0%;
+    
+    /* Borders */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 213 89% 21%;
+    
+    --radius: 0.5rem;
+    
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 15% 20%;
+    --sidebar-primary: 213 89% 21%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 20% 96%;
+    --sidebar-accent-foreground: 220 15% 20%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 213 89% 21%;
+    
+    /* Chart colors */
+    --chart-1: 213 89% 21%;
+    --chart-2: 210 79% 46%;
+    --chart-3: 207 90% 61%;
+    --chart-4: 142 71% 45%;
+    --chart-5: 36 100% 50%;
+    --chart-6: 330 81% 60%;
+    
+    /* Custom gradient stops */
+    --gradient-primary-start: 213 89% 21%;
+    --gradient-primary-end: 210 79% 46%;
+  }
+
+  .dark {
+    --primary: 210 40% 98%;
+    --primary-foreground: 213 89% 21%;
+    
+    --secondary: 210 79% 46%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --accent: 207 90% 61%;
+    --accent-foreground: 213 89% 21%;
+    
+    --background: 220 20% 10%;
+    --foreground: 210 40% 98%;
+    
+    --card: 220 18% 14%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 220 18% 14%;
+    --popover-foreground: 210 40% 98%;
+    
+    --muted: 220 16% 18%;
+    --muted-foreground: 215 20% 65%;
+    
+    --border: 220 16% 20%;
+    --input: 220 16% 20%;
+    --ring: 210 79% 46%;
+    
+    --sidebar-background: 220 18% 12%;
+    --sidebar-foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* Header gradient */
+  .header-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+  }
+  
+  /* Ranking board gradient */
+  .ranking-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+  }
+  
+  /* Query section gradient */
+  .query-gradient {
+    background: linear-gradient(135deg, hsl(210 100% 95%) 0%, hsl(280 100% 97%) 100%);
+  }
+  
+  /* Card hover effect */
+  .card-interactive {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg cursor-pointer;
+  }
+  
+  /* Trend colors */
+  .trend-up {
+    @apply text-success;
+  }
+  
+  .trend-down {
+    @apply text-danger;
+  }
+  
+  .trend-neutral {
+    @apply text-muted-foreground;
+  }
+  
+  /* Filter button active state */
+  .filter-active {
+    @apply bg-secondary text-secondary-foreground border-secondary;
+  }
+  
+  /* Badge variants */
+  .badge-replaced {
+    @apply bg-orange-50 text-orange-700 border border-orange-200;
+  }
+  
+  .badge-removed {
+    @apply bg-red-50 text-red-700 border border-red-200;
+  }
+  
+  .badge-new {
+    @apply bg-green-50 text-green-700 border border-green-200;
+  }
+  
+  .badge-changed {
+    @apply bg-blue-50 text-blue-700 border border-blue-200;
+  }
+  
+  /* Monospace for scores */
+  .score-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Tab active state */
+  .tab-active {
+    @apply text-secondary border-b-2 border-secondary;
+  }
+  
+  /* Sidebar transition */
+  .sidebar-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+@layer utilities {
+  /* Glassmorphism effect */
+  .glass {
+    @apply bg-card/80 backdrop-blur-sm;
+  }
+  
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  }
+  
+  /* Subtle shadow for cards */
+  .shadow-card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  }
+  
+  /* Glow effect */
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(25, 118, 210, 0.15);
+  }
+}
