@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+31
+  import { useState, useMemo } from "react";
 import { Indicator, pillars } from "@/data/indicators";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -29,11 +30,7 @@ export function IndicatorTable({ indicators, statusFilter, onStatusFilterChange 
 
     // Year filter - based on indicator status, NOT on score null/not-null
     if (yearFilter === "2023") {
-      // 2023 universe: exclude "new" indicators (they didn't exist in 2023)
-      // This gives us 69 indicators including "replaced" and "removed" ones
-      result = result.filter(i => i.indicatorStatus !== "new");
-    } else if (yearFilter === "2025") {
-      // 2025 universe: exclude "replaced" and "removed" indicators (they were superseded/removed)
+    result = result.filter(i => i.indicatorStatus !== "new" && i.indicatorStatus !== "code-changed");      // 2025 universe: exclude "replaced" and "removed" indicators (they were superseded/removed)
       // This gives us 77 indicators including "new" and "code-changed" ones
       result = result.filter(i => i.indicatorStatus !== "replaced" && i.indicatorStatus !== "removed");
     }
